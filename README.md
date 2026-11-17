@@ -14,6 +14,21 @@
   <img alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey">
 </p>
 
+<p align="center">
+  <a href="#download">Download</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#build-from-source">Build</a> ·
+  <a href="#license">License</a>
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
+    <img src="docs/screenshots/home.png" alt="Machat home screen with three accounts" width="900">
+  </picture>
+</p>
+
 ---
 
 ## Purpose
@@ -60,6 +75,43 @@ Machat is an independent project. It is not affiliated with, endorsed by, or spo
 - Light and dark themes with a calm matcha palette
 - Respects the system's reduced-motion setting
 - Choose your download folder
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/censor.png" alt="Open chat with names, messages and media blurred">
+      <p align="center"><b>Privacy censor</b><br><sub>Names, messages and media blurred while you share your screen.</sub></p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/ai-assistant.png" alt="AI assistant panel beside a chat">
+      <p align="center"><b>AI assistant</b><br><sub>Draft replies, auto-assist modes and rule watching, next to the chat.</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/settings-censor.png" alt="Censor settings with live preview">
+      <p align="center"><b>Censor settings</b><br><sub>Choose what to hide and how, with a live preview.</sub></p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/settings-ai.png" alt="AI assistant settings with a test call">
+      <p align="center"><b>AI settings</b><br><sub>Provider, model, tone and a test call on a sample chat.</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/lock.png" alt="Lock screen in light theme">
+      <p align="center"><b>App lock</b><br><sub>PIN or password, with auto-lock in the background.</sub></p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/lock-dark.png" alt="Lock screen in dark theme">
+      <p align="center"><b>Light and dark</b><br><sub>Follows your system theme, or set it yourself.</sub></p>
+    </td>
+  </tr>
+</table>
+
+<sub>The screenshots use demo accounts and sample conversations.</sub>
 
 ## Download
 
