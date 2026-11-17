@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=machat
+Comment=Local chat desktop app built on libgo
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/machat %u
+Terminal=false
+Type=Application
+Icon=machat
+Categories=Utility;
+StartupWMClass=machat
+
+ 
