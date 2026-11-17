@@ -36,7 +36,7 @@ test('stored hashed with random salt, not plaintext, file 0600', () => {
   assert.ok(!plain.includes('4821'));
   s.setPin('4821');
   assert.notEqual(JSON.parse(raw()).app_pin, h, 'salt must be random');
-  assert.equal(fs.statSync(path.join(dir, `s${n - 1}.json`)).mode & 0o777, 0o600);
+  if (process.platform !== 'win32') assert.equal(fs.statSync(path.join(dir, `s${n - 1}.json`)).mode & 0o777, 0o600);
 });
 
 test('verify ok and wrong', () => {
