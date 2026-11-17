@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp Fixture</title>
+<style>
+  html, body { margin: 0; height: 100%; font-family: sans-serif; }
+  body { display: flex; }
+  #pane-side { width: 300px; border-right: 1px solid #ccc; overflow: auto; }
+  #pane-side [role="listitem"] { display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid #eee; }
+  #pane-side img { width: 40px; height: 40px; border-radius: 50%; }
+  #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  #main > header { display: flex; align-items: center; gap: 8px; height: 60px; padding: 0 12px; border-bottom: 1px solid #ccc; }
+  #main > header img { width: 40px; height: 40px; border-radius: 50%; }
+  #main [role="application"] { flex: 1; overflow: auto; padding: 12px; }
+  #main [role="row"] { margin: 6px 0; }
+  #main [role="row"], #main .x-row { margin: 6px 0; }
+  .message-in, .message-out { display: inline-block; max-width: 60%; padding: 6px 10px; border-radius: 10px; background: #dff0e6; }
+  .message-out { background: #d6e4ff; }
+  .x-row > .message-in { background: #dff0e6; }
+  .emoji { width: 16px; height: 16px; background: #c33; }
+  footer { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid #ccc; }
+  footer [contenteditable="true"] { flex: 1; min-height: 24px; padding: 6px; border: 1px solid #ccc; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="pane-side" role="grid">
+  <div role="listitem">
+    <img src="https://pps.whatsapp.net/x" alt="">
+    <div role="gridcell">
+      <div><span dir="auto" title="Project Team">Project Team</span></div>
+      <div><span title="Bob: Can we ship Friday?">Bob: Can we ship Friday?</span></div>
+    </div>
+  </div>
+  <div role="listitem">
+    <img src="https://pps.whatsapp.net/x" alt="">
+    <div role="gridcell">
+      <div><span dir="auto" title="Alice">Alice</span></div>
+      <div><span title="Look at this">Look at this</span></div>
+    </div>
+  </div>
+  <div role="listitem">
+    <img src="https://pps.whatsapp.net/x" alt="">
+    <div role="gridcell">
+      <div><span dir="auto" title="Bob">Bob</span></div>
+      <div><span title="Ok, see you">Ok, see you</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <header>
+    <img src="https://pps.whatsapp.net/x" alt="">
+    <span dir="auto" title="Project Team">Project Team</span>
+  </header>
+  <div role="application">
+    <div role="row"><div><span dir="auto">TODAY</span></div></div>
+
+    <div role="row">
+      <div class="message-in" data-id="false_alice-1@c.us_A1">
+        <div data-pre-plain-text="[10:40, 11/8/2026] Alice: ">
+          <span class="selectable-text copyable-text" dir="ltr"><span>Morning all, is the build green?</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div role="row">
+      <div class="message-in" data-id="false_alice-1@c.us_A2">
+        <div data-pre-plain-text="[10:41, 11/8/2026] : ">
+          <span class="selectable-text copyable-text" dir="ltr"><span>Also, the release notes are in the wiki.</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div role="row">
+      <div class="message-in" data-id="false_bob-2@c.us_B1">
+        <div data-pre-plain-text="[10:42, 11/8/2026] Bob: ">
+          <span class="selectable-text copyable-text" dir="ltr"><span>Can we ship Friday?</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div role="row">
+      <div class="message-out" data-id="true_me@c.us_C1">
+        <div data-pre-plain-text="[10:43, 11/8/2026] Me: ">
+          <span class="selectable-text copyable-text" dir="ltr"><span>Checking with QA, will confirm.</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div role="row">
+      <div class="message-in" data-id="false_alice-1@c.us_A3">
+        <div data-pre-plain-text="[10:44, 11/8/2026] Alice: ">
+          <img src="blob:https://web.whatsapp.com/5f1c2a7e-0000-4000-8000-000000000001" width="300">
+        </div>
+      </div>
+    </div>
+
+    <div role="row">
+      <div class="message-out" data-id="true_me@c.us_C2">
+        <div data-pre-plain-text="[10:45, 11/8/2026] Me: ">
+          <span data-icon="document-pdf"></span><span>report.pdf</span>
+        </div>
+      </div>
+    </div>
+
+    <div role="row">
+      <div class="message-in" data-id="false_bob-2@c.us_B2">
+        <div data-pre-plain-text="[10:46, 11/8/2026] Bob: ">
+          <span class="selectable-text copyable-text" dir="ltr"><span>Look at &lt;b&gt;this&lt;/b&gt; and &lt;script&gt;alert(1)&lt;/script&gt;</span></span>
+        </div>
+      </div>
+    </div>
+    <!-- Leak-test rows (not role="row", so the reader ignores them): quoted reply, mention, link, emoji, caption, file card. -->
+    <div class="x-row">
+      <div class="message-in bubble-bg" data-id="false_bob-2@c.us_B3">
+        <div aria-label="Quoted message"><span dir="auto">Alice</span><span class="quoted-mention">quoted secret line</span></div>
+        <div data-pre-plain-text="[10:47, 11/8/2026] Bob: ">
+          <span class="selectable-text copyable-text" dir="ltr"><span>Ping <a class="mention" href="#">@alice</a> see <a href="https://example.com/x">example.com/x</a> <img class="emoji" alt="x" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="> ok</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="x-row">
+      <div class="message-in bubble-bg" data-id="false_alice-1@c.us_A4">
+        <div data-pre-plain-text="[10:48, 11/8/2026] Alice: ">
+          <img src="blob:https://web.whatsapp.com/5f1c2a7e-0000-4000-8000-000000000002" width="120">
+          <span class="selectable-text copyable-text" dir="ltr"><span>Caption under the photo</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div contenteditable="true" role="textbox" aria-label="Type a message"></div>
+    <button type="button" data-icon="send" aria-label="Send">Send</button>
+  </footer>
+</div>
+
+<script>
+  document.querySelector('[data-icon="send"]').addEventListener('click', function () {
+    window.__sent = true;
+  });
+</script>
+</body>
+</html>

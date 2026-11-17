@@ -1,0 +1,13 @@
+{
+  "chat": "Project Team",
+  "truncated": false,
+  "messages": [
+    { "sender": "Alice", "time": "10:40", "text": "Morning all, is the build green?", "kind": "text", "out": false },
+    { "sender": "Alice", "time": "10:41", "text": "Also, the release notes are in the wiki.", "kind": "text", "out": false },
+    { "sender": "Bob", "time": "10:42", "text": "Can we ship Friday?", "kind": "text", "out": false },
+    { "sender": "", "time": "10:43", "text": "Checking with QA, will confirm.", "kind": "text", "out": true },
+    { "sender": "Alice", "time": "10:44", "text": "", "kind": "image", "out": false },
+    { "sender": "", "time": "10:45", "text": "", "kind": "document", "out": true },
+    { "sender": "Bob", "time": "10:46", "text": "Look at <b>this</b> and <script>alert(1)</script>", "kind": "text", "out": false }
+  ]
+}

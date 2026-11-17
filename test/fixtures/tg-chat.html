@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Telegram Fixture</title>
+<!-- Mock of Telegram Web K shaped like the UNVERIFIED selectors in inject/selectors-tg.js. Not the real DOM. -->
+<style>
+  html, body { margin: 0; height: 100%; font-family: sans-serif; }
+  body { display: flex; }
+  #column-left { width: 300px; border-right: 1px solid #ccc; }
+  #column-center { flex: 1; }
+  .chatlist-chat { display: flex; gap: 8px; padding: 10px; }
+  avatar-element { display: block; width: 40px; height: 40px; border-radius: 50%; background: #39c; }
+  .bubble { margin: 6px 0; }
+  .bubble-content { display: inline-block; padding: 6px 10px; border-radius: 10px; background: #e6f0ff; }
+  .emoji { width: 16px; height: 16px; background: #c33; }
+</style>
+</head>
+<body>
+<div id="column-left"><div class="chatlist">
+  <a class="chatlist-chat"><avatar-element></avatar-element><div><span class="peer-title">Carol</span><div class="dialog-subtitle">See you at five</div></div></a>
+  <a class="chatlist-chat"><avatar-element></avatar-element><div><span class="peer-title">Dave</span><div class="dialog-subtitle">ok</div></div></a>
+</div></div>
+<div id="column-center">
+  <div class="chat-info"><avatar-element></avatar-element><span class="peer-title">Carol</span></div>
+  <div class="bubbles">
+    <div class="bubble"><div class="message">Lunch tomorrow?</div></div>
+    <div class="bubble"><div class="message">Yes, noon works.</div></div>
+    <div class="bubble"><div class="bubble-content"><div class="reply"><div class="reply-content">quoted secret line</div></div><div class="message">Ping <a class="mention" href="#">@carol</a> see <a href="https://example.com/x">example.com/x</a> <img class="emoji" alt="x" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="> ok</div></div></div>
+  </div>
+</div>
+<script>
+  window.__lastNotif = null;
+  if (location.hash === '#notify') new Notification('Carol', { body: 'secret' });
+</script>
+</body>
+</html>

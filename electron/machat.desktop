@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Machat
+Comment=WhatsApp Web and Telegram in one window
+# Edit the path to your checkout (see README).
+Exec=sh -c 'cd "$HOME/Code/github/moeghifar/machat-web" && exec ./node_modules/electron/dist/electron .'
+Icon=machat
+Terminal=false
+Categories=Network;InstantMessaging;
+StartupWMClass=machat

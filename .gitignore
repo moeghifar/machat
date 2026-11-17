@@ -1,8 +1,7 @@
-.task
-.wails
-bin
-frontend/dist/*
-frontend/node_modules
-!frontend/dist/.gitkeep
-frontend/test-results
-frontend/playwright-report
+node_modules/
+dist/
+target/
+src-tauri/target/
+src-tauri/gen/
+src-tauri/permissions/
+release/

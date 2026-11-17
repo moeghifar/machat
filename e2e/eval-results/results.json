@@ -1,0 +1,1047 @@
+{
+  "at": "2026-11-16T14:56:16.824Z",
+  "passed": 26,
+  "total": 26,
+  "results": [
+    {
+      "run": "dry",
+      "case": "greeting",
+      "chat": "Rina",
+      "pass": true,
+      "want": [
+        "dry-run"
+      ],
+      "got": [
+        "dry-run"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Rina: Hello, good morning!"
+        },
+        {
+          "decision": "dry-run",
+          "why": "all checks passed (dry run: nothing sent)",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[10:46] bob: look at <b>this</b> and <script>alert(1)</script>",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[10:46] bob: look at <b>this</b> and <script>alert(1)</script>",
+          "out": "{\"reply\":\"Let me get a colleague to help you with that.\",\"confidence\":0.3,\"handoff\":true}",
+          "temperature": 0.2
+        },
+        {
+          "kind": "triage",
+          "last": "[dry-0-0] rina: hello, good morning!",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-0-0] rina: hello, good morning!",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "FAQ hit (opening hours)",
+      "chat": "Budi",
+      "pass": true,
+      "want": [
+        "dry-run"
+      ],
+      "got": [
+        "dry-run"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Budi: What are your opening hours?"
+        },
+        {
+          "decision": "dry-run",
+          "why": "all checks passed (dry run: nothing sent)",
+          "text": "We are open Monday to Friday, 09:00 to 17:00.",
+          "conf": 0.95
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-1-0] budi: what are your opening hours?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-1-0] budi: what are your opening hours?",
+          "out": "{\"reply\":\"We are open Monday to Friday, 09:00 to 17:00.\",\"confidence\":0.95,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "out of scope -> handoff",
+      "chat": "Citra",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Citra: I want my money back or I call my lawyer"
+        },
+        {
+          "decision": "draft",
+          "why": "model asked for a human",
+          "text": "Let me get a colleague to help you with that.",
+          "conf": 0.3
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-2-0] citra: i want my money back or i call my lawyer",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-2-0] citra: i want my money back or i call my lawyer",
+          "out": "{\"reply\":\"Let me get a colleague to help you with that.\",\"confidence\":0.3,\"handoff\":true}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "thanks -> no reply needed",
+      "chat": "Dewi",
+      "pass": true,
+      "want": [
+        "skip"
+      ],
+      "got": [
+        "skip"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Dewi: ok thanks!"
+        },
+        {
+          "decision": "skip",
+          "why": "no reply needed (llm)",
+          "text": "",
+          "conf": null
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-3-0] dewi: ok thanks!",
+          "out": "NO",
+          "temperature": null
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "not on the allowlist",
+      "chat": "Stranger",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Stranger: Hello?"
+        },
+        {
+          "decision": "draft",
+          "why": "chat not on the allowlist",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-4-0] stranger: hello?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-4-0] stranger: hello?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "group message",
+      "chat": "Project Team",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Ana: hi all"
+        },
+        {
+          "in": "Bob: Hello, anyone there?"
+        },
+        {
+          "decision": "draft",
+          "why": "group chat",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-5-0] bob: hello, anyone there?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-5-0] bob: hello, anyone there?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "burst -> per-chat rate limit",
+      "chat": "Eka",
+      "pass": true,
+      "want": [
+        "dry-run",
+        "draft",
+        "draft"
+      ],
+      "got": [
+        "dry-run",
+        "draft",
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Eka: Hello"
+        },
+        {
+          "decision": "dry-run",
+          "why": "all checks passed (dry run: nothing sent)",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        },
+        {
+          "in": "Eka: hello??"
+        },
+        {
+          "decision": "draft",
+          "why": "hourly limit for this chat",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        },
+        {
+          "in": "Eka: Hi, are you there?"
+        },
+        {
+          "decision": "draft",
+          "why": "hourly limit for this chat",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-6-0] eka: hello",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-6-0] eka: hello",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        },
+        {
+          "kind": "triage",
+          "last": "[dry-6-1] eka: hello??",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-6-1] eka: hello??",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        },
+        {
+          "kind": "triage",
+          "last": "[dry-6-2] eka: hi, are you there?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-6-2] eka: hi, are you there?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "duplicate message",
+      "chat": "Fajar",
+      "pass": true,
+      "want": [
+        "dry-run",
+        "skip"
+      ],
+      "got": [
+        "dry-run",
+        "skip"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Fajar: Hi there"
+        },
+        {
+          "decision": "dry-run",
+          "why": "all checks passed (dry run: nothing sent)",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        },
+        {
+          "in": "Fajar: Hi there (reported again)"
+        },
+        {
+          "decision": "skip",
+          "why": "already handled this message",
+          "text": "",
+          "conf": null
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-7-0] fajar: hi there",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-7-0] fajar: hi there",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "quiet hours",
+      "chat": "Gita",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Gita: Hello, are you open?"
+        },
+        {
+          "decision": "draft",
+          "why": "quiet hours",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-8-0] gita: hello, are you open?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-8-0] gita: hello, are you open?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "human typed recently",
+      "chat": "Hadi",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Hadi: Hello!"
+        },
+        {
+          "decision": "draft",
+          "why": "you typed in this chat recently",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-9-0] hadi: hello!",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[dry-9-0] hadi: hello!",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "dry",
+      "case": "errors -> auto-disable",
+      "chat": "Indra",
+      "pass": true,
+      "want": [
+        "error",
+        "error"
+      ],
+      "got": [
+        "error",
+        "error"
+      ],
+      "note": "Full auto turned itself off",
+      "transcript": [
+        {
+          "in": "Indra: error one"
+        },
+        {
+          "decision": "error",
+          "why": "Request failed (400): eval: scripted failure",
+          "text": "",
+          "conf": null
+        },
+        {
+          "in": "Indra: error two"
+        },
+        {
+          "decision": "error",
+          "why": "Request failed (400): eval: scripted failure",
+          "text": "",
+          "conf": null
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-10-0] indra: error one",
+          "out": null,
+          "temperature": null
+        },
+        {
+          "kind": "triage",
+          "last": "[dry-10-1] indra: error two",
+          "out": null,
+          "temperature": null
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "greeting",
+      "chat": "Rina",
+      "pass": true,
+      "want": [
+        "sent"
+      ],
+      "got": [
+        "sent"
+      ],
+      "note": "sent in page: \"Hello! How can I help you today?\"",
+      "transcript": [
+        {
+          "in": "Rina: Hello, good morning!"
+        },
+        {
+          "decision": "sent",
+          "why": "all checks passed",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[dry-10-1] indra: error two",
+          "out": null,
+          "temperature": null
+        },
+        {
+          "kind": "triage",
+          "last": "[live-0-0] rina: hello, good morning!",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-0-0] rina: hello, good morning!",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "FAQ hit (opening hours)",
+      "chat": "Budi",
+      "pass": true,
+      "want": [
+        "sent"
+      ],
+      "got": [
+        "sent"
+      ],
+      "note": "sent in page: \"We are open Monday to Friday, 09:00 to 17:00.\"",
+      "transcript": [
+        {
+          "in": "Budi: What are your opening hours?"
+        },
+        {
+          "decision": "sent",
+          "why": "all checks passed",
+          "text": "We are open Monday to Friday, 09:00 to 17:00.",
+          "conf": 0.95
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-1-0] budi: what are your opening hours?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-1-0] budi: what are your opening hours?",
+          "out": "{\"reply\":\"We are open Monday to Friday, 09:00 to 17:00.\",\"confidence\":0.95,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "out of scope -> handoff",
+      "chat": "Citra",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Citra: I want my money back or I call my lawyer"
+        },
+        {
+          "decision": "draft",
+          "why": "model asked for a human",
+          "text": "Let me get a colleague to help you with that.",
+          "conf": 0.3
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-2-0] citra: i want my money back or i call my lawyer",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-2-0] citra: i want my money back or i call my lawyer",
+          "out": "{\"reply\":\"Let me get a colleague to help you with that.\",\"confidence\":0.3,\"handoff\":true}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "thanks -> no reply needed",
+      "chat": "Dewi",
+      "pass": true,
+      "want": [
+        "skip"
+      ],
+      "got": [
+        "skip"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Dewi: ok thanks!"
+        },
+        {
+          "decision": "skip",
+          "why": "no reply needed (llm)",
+          "text": "",
+          "conf": null
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-3-0] dewi: ok thanks!",
+          "out": "NO",
+          "temperature": null
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "not on the allowlist",
+      "chat": "Stranger",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Stranger: Hello?"
+        },
+        {
+          "decision": "draft",
+          "why": "chat not on the allowlist",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-4-0] stranger: hello?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-4-0] stranger: hello?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "group message",
+      "chat": "Project Team",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Ana: hi all"
+        },
+        {
+          "in": "Bob: Hello, anyone there?"
+        },
+        {
+          "decision": "draft",
+          "why": "group chat",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-5-0] bob: hello, anyone there?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-5-0] bob: hello, anyone there?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "burst -> per-chat rate limit",
+      "chat": "Eka",
+      "pass": true,
+      "want": [
+        "sent",
+        "draft",
+        "draft"
+      ],
+      "got": [
+        "sent",
+        "draft",
+        "draft"
+      ],
+      "note": "sent in page: \"Hello! How can I help you today?\"",
+      "transcript": [
+        {
+          "in": "Eka: Hello"
+        },
+        {
+          "decision": "sent",
+          "why": "all checks passed",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        },
+        {
+          "in": "Eka: hello??"
+        },
+        {
+          "decision": "draft",
+          "why": "hourly limit for this chat",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        },
+        {
+          "in": "Eka: Hi, are you there?"
+        },
+        {
+          "decision": "draft",
+          "why": "hourly limit for this chat",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-6-0] eka: hello",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-6-0] eka: hello",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        },
+        {
+          "kind": "triage",
+          "last": "[live-6-1] eka: hello??",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-6-1] eka: hello??",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        },
+        {
+          "kind": "triage",
+          "last": "[live-6-2] eka: hi, are you there?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-6-2] eka: hi, are you there?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "duplicate message",
+      "chat": "Fajar",
+      "pass": true,
+      "want": [
+        "sent",
+        "skip"
+      ],
+      "got": [
+        "sent",
+        "skip"
+      ],
+      "note": "sent in page: \"Hello! How can I help you today?\"",
+      "transcript": [
+        {
+          "in": "Fajar: Hi there"
+        },
+        {
+          "decision": "sent",
+          "why": "all checks passed",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        },
+        {
+          "in": "Fajar: Hi there (reported again)"
+        },
+        {
+          "decision": "skip",
+          "why": "already handled this message",
+          "text": "",
+          "conf": null
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-7-0] fajar: hi there",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-7-0] fajar: hi there",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "quiet hours",
+      "chat": "Gita",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Gita: Hello, are you open?"
+        },
+        {
+          "decision": "draft",
+          "why": "quiet hours",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-8-0] gita: hello, are you open?",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-8-0] gita: hello, are you open?",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "human typed recently",
+      "chat": "Hadi",
+      "pass": true,
+      "want": [
+        "draft"
+      ],
+      "got": [
+        "draft"
+      ],
+      "note": "",
+      "transcript": [
+        {
+          "in": "Hadi: Hello!"
+        },
+        {
+          "decision": "draft",
+          "why": "you typed in this chat recently",
+          "text": "Hello! How can I help you today?",
+          "conf": 0.92
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-9-0] hadi: hello!",
+          "out": "YES",
+          "temperature": null
+        },
+        {
+          "kind": "autoreply",
+          "last": "[live-9-0] hadi: hello!",
+          "out": "{\"reply\":\"Hello! How can I help you today?\",\"confidence\":0.92,\"handoff\":false}",
+          "temperature": 0.2
+        }
+      ]
+    },
+    {
+      "run": "live",
+      "case": "errors -> auto-disable",
+      "chat": "Indra",
+      "pass": true,
+      "want": [
+        "error",
+        "error"
+      ],
+      "got": [
+        "error",
+        "error"
+      ],
+      "note": "Full auto turned itself off",
+      "transcript": [
+        {
+          "in": "Indra: error one"
+        },
+        {
+          "decision": "error",
+          "why": "Request failed (400): eval: scripted failure",
+          "text": "",
+          "conf": null
+        },
+        {
+          "in": "Indra: error two"
+        },
+        {
+          "decision": "error",
+          "why": "Request failed (400): eval: scripted failure",
+          "text": "",
+          "conf": null
+        }
+      ],
+      "calls": [
+        {
+          "kind": "triage",
+          "last": "[live-10-0] indra: error one",
+          "out": null,
+          "temperature": null
+        },
+        {
+          "kind": "triage",
+          "last": "[live-10-1] indra: error two",
+          "out": null,
+          "temperature": null
+        }
+      ]
+    },
+    {
+      "run": "ui",
+      "case": "custom template appears in Ask and is sent",
+      "pass": true,
+      "want": [
+        "button + text"
+      ],
+      "got": [
+        "button + text"
+      ],
+      "note": "",
+      "transcript": [],
+      "calls": []
+    },
+    {
+      "run": "ui",
+      "case": "edited prompt file used without restart",
+      "pass": true,
+      "want": [
+        "edited text"
+      ],
+      "got": [
+        "edited text"
+      ],
+      "note": "",
+      "transcript": [],
+      "calls": []
+    },
+    {
+      "run": "ui",
+      "case": "kill switch turns Full auto off",
+      "pass": true,
+      "want": [
+        "off"
+      ],
+      "got": [
+        "off"
+      ],
+      "note": "",
+      "transcript": [],
+      "calls": []
+    },
+    {
+      "run": "ui",
+      "case": "live needed the confirm dialog",
+      "pass": true,
+      "want": [
+        "asked"
+      ],
+      "got": [
+        "asked"
+      ],
+      "note": "Send replies for real?",
+      "transcript": [],
+      "calls": []
+    }
+  ]
+}

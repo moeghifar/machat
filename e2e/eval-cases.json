@@ -1,0 +1,17 @@
+{
+  "_help": "Full auto eval cases (MACHAT_SCENARIO=eval). Each case runs twice: dry run, then live against the mock. posts: each entry is a list of [sender, text] incoming messages appended to the chat, or \"same\" to make the page report the previous message again. expect.dry / expect.live: one decision per post (sent | dry-run | draft | skip | error). cfg: overrides of settings.autoreply for this case (quiet: \"now\" puts the clock inside quiet hours). human: the owner presses a key in the composer first. after: \"stopped\" checks Full auto turned itself off. The mock model (e2e/mock-server.mjs, model eval-model) answers greetings and opening hours, says NO to thanks/ok, fails on the word error, and hands off anything else.",
+  "base": { "allow": "Rina\nBudi\nCitra\nDewi\nProject Team\nEka\nFajar\nGita\nHadi\nIndra", "groups": false, "per_chat_hour": 3, "global_hour": 100, "min_gap_s": 0, "quiet_from": "", "quiet_to": "", "min_conf": 0.7, "max_errors": 3, "human_idle_s": 120 },
+  "cases": [
+    { "name": "greeting", "chat": "Rina", "posts": [[["Rina", "Hello, good morning!"]]], "expect": { "dry": ["dry-run"], "live": ["sent"] } },
+    { "name": "FAQ hit (opening hours)", "chat": "Budi", "posts": [[["Budi", "What are your opening hours?"]]], "expect": { "dry": ["dry-run"], "live": ["sent"] } },
+    { "name": "out of scope -> handoff", "chat": "Citra", "posts": [[["Citra", "I want my money back or I call my lawyer"]]], "expect": { "dry": ["draft"], "live": ["draft"] } },
+    { "name": "thanks -> no reply needed", "chat": "Dewi", "posts": [[["Dewi", "ok thanks!"]]], "expect": { "dry": ["skip"], "live": ["skip"] } },
+    { "name": "not on the allowlist", "chat": "Stranger", "posts": [[["Stranger", "Hello?"]]], "expect": { "dry": ["draft"], "live": ["draft"] } },
+    { "name": "group message", "chat": "Project Team", "posts": [[["Ana", "hi all"], ["Bob", "Hello, anyone there?"]]], "expect": { "dry": ["draft"], "live": ["draft"] } },
+    { "name": "burst -> per-chat rate limit", "chat": "Eka", "cfg": { "per_chat_hour": 1 }, "posts": [[["Eka", "Hello"]], [["Eka", "hello??"]], [["Eka", "Hi, are you there?"]]], "expect": { "dry": ["dry-run", "draft", "draft"], "live": ["sent", "draft", "draft"] } },
+    { "name": "duplicate message", "chat": "Fajar", "posts": [[["Fajar", "Hi there"]], "same"], "expect": { "dry": ["dry-run", "skip"], "live": ["sent", "skip"] } },
+    { "name": "quiet hours", "chat": "Gita", "cfg": { "quiet": "now" }, "posts": [[["Gita", "Hello, are you open?"]]], "expect": { "dry": ["draft"], "live": ["draft"] } },
+    { "name": "human typed recently", "chat": "Hadi", "human": true, "posts": [[["Hadi", "Hello!"]]], "expect": { "dry": ["draft"], "live": ["draft"] } },
+    { "name": "errors -> auto-disable", "chat": "Indra", "cfg": { "max_errors": 2 }, "posts": [[["Indra", "error one"]], [["Indra", "error two"]]], "expect": { "dry": ["error", "error"], "live": ["error", "error"] }, "after": "stopped" }
+  ]
+}
