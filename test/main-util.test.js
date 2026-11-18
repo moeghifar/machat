@@ -4,7 +4,18 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { navDecision, downloadTarget, validId, viewRect, permitted, winAct, accountUA, validEndpoint, WA_URL, TG_URL, fitBounds, serviceUrl, overrideServiceUrls } from '../electron/util.js';
+import { navDecision, downloadTarget, validId, viewRect, permitted, winAct, accountUA, validEndpoint, WA_URL, TG_URL, fitBounds, serviceUrl, overrideServiceUrls, confine } from '../electron/util.js';
+
+test('confine keeps file-manager paths inside the download base', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'mc-conf-'));
+  fs.mkdirSync(path.join(base, 'acct'));
+  fs.symlinkSync(os.tmpdir(), path.join(base, 'out'));
+  assert.equal(confine(base, ''), base);
+  assert.equal(confine(base, 'acct/x.txt'), path.join(base, 'acct', 'x.txt'));
+  for (const bad of ['..', '../x', 'acct/../../x', '/etc/passwd', base + '-evil', 'out', 'out/x', 'a\0b', 5])
+    assert.throws(() => confine(base, bad), undefined, String(bad));
+  fs.rmSync(base, { recursive: true });
+});
 
 test('whatsapp navigation stays on its exact origin', () => {
   assert.equal(navDecision('https://web.whatsapp.com/send?x=1', WA_URL), 'allow');

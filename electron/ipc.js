@@ -1,11 +1,11 @@
 // Shell command table (same snake_case names as src-tauri/src/commands.rs) and the ipc handlers.
-import { ipcMain, dialog, utilityProcess, Notification, shell, nativeTheme } from 'electron';
+import { ipcMain, dialog, utilityProcess, Notification, shell, nativeTheme, clipboard } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fromShell } from './settings.js';
 import * as AI from './ai.js';
-import { serviceUrl } from './util.js';
+import { serviceUrl, confine } from './util.js';
 import { makeQueue, makeLimiter, SWITCH_MS, MAX_QUEUE, MATCH_CAP, validateRules } from './agent-core.js';
 import { makeSender, sendBlocked } from './send.js';
 import { makeAuto } from './auto.js';
@@ -321,11 +321,45 @@ export function registerIpc(m) {
     rename_account: ({ id, name }) => m.accts.rename(id, name),
     // App-wide: drives prefers-color-scheme in the shell and in every account page.
     set_theme: ({ theme }) => { nativeTheme.themeSource = ['light', 'dark'].includes(theme) ? theme : 'system'; },
-    // The active account's download folder (created if missing), else the base folder.
-    open_downloads: async () => {
-      const dir = m.accts.downloadDir(m.state.active);
-      fs.mkdirSync(dir, { recursive: true });
-      const err = await shell.openPath(dir);
+    // File manager over the download base. Paths are relative to the base and confined to it (util.confine).
+    // No dir: the active account's folder (created if missing), else the base.
+    files_list: ({ dir }) => {
+      const base = m.accts.downloadDir(null);
+      if (dir == null) {
+        const own = m.accts.downloadDir(m.state.active);
+        fs.mkdirSync(own, { recursive: true });
+        dir = path.relative(base, own);
+      }
+      const abs = confine(base, dir);
+      const entries = fs.readdirSync(abs, { withFileTypes: true }).filter((d) => !d.name.startsWith('.')).map((d) => {
+        let st = null; try { st = fs.statSync(path.join(abs, d.name)); } catch {}
+        return { name: d.name, dir: !!st?.isDirectory(), size: st?.size ?? 0, mtime: st?.mtimeMs ?? 0 };
+      });
+      return { dir: path.relative(base, abs), sep: path.sep, entries };
+    },
+    files_open: async ({ path: p }) => { const err = await shell.openPath(confine(m.accts.downloadDir(null), p)); if (err) throw new Error(err); },
+    files_show: ({ path: p }) => shell.showItemInFolder(confine(m.accts.downloadDir(null), p)),
+    // ponytail: path as text on every OS; real file-object paste needs per-OS clipboard formats.
+    files_copy: ({ path: p }) => clipboard.writeText(confine(m.accts.downloadDir(null), p)),
+    files_rename: ({ path: p, name }) => {
+      if (typeof name !== 'string' || !name.trim() || /[/\\\0]/.test(name) || name === '.' || name === '..') throw new Error('invalid name');
+      const base = m.accts.downloadDir(null);
+      const from = confine(base, p);
+      if (from === path.resolve(base)) throw new Error('invalid path');
+      const to = confine(base, path.join(path.dirname(path.relative(base, from)), name.trim()));
+      if (fs.existsSync(to)) throw new Error('a file with that name already exists');
+      fs.renameSync(from, to);
+    },
+    files_trash: ({ path: p }) => {
+      const base = m.accts.downloadDir(null);
+      const f = confine(base, p);
+      if (f === path.resolve(base)) throw new Error('invalid path');
+      return shell.trashItem(f);
+    },
+    files_open_dir: async ({ dir }) => {
+      const d = confine(m.accts.downloadDir(null), dir ?? '');
+      fs.mkdirSync(d, { recursive: true });
+      const err = await shell.openPath(d);
       if (err) throw new Error(err);
     },
     pick_folder: async () => {

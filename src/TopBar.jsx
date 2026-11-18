@@ -49,6 +49,10 @@ export const ICONS = {
   queue: () => <><path d="M9 6.5h11M9 12h11M9 17.5h11" /><circle class="r" cx="4.6" cy="6.5" r="1.4" /><circle class="r" cx="4.6" cy="12" r="1.4" /><circle class="r" cx="4.6" cy="17.5" r="1.4" /></>,
   watch: () => <><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></>,
   folder: () => <><path d="M3 7.5a2 2 0 0 1 2-2h4.2l2 2.2H19a2 2 0 0 1 2 2v8.3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" /><path class="r" d="M12 11v5M9.8 13.8 12 16l2.2-2.2" /></>,
+  file: () => <><path d="M6 3h8l5 5v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" /><path d="M14 3v5h5" /></>,
+  image: () => <><rect x="3" y="4.5" width="18" height="15" rx="2.5" /><circle cx="9" cy="10" r="1.8" /><path d="m4 18 5.5-5 4 3.5 2.5-2 4 3.5" /></>,
+  video: () => <><rect x="3" y="5.5" width="13" height="13" rx="2.5" /><path d="m16 10 5-3v10l-5-3" /></>,
+  audio: () => <><path d="M9 18V5.5l11-2V16" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="17.5" cy="16" r="2.5" /></>,
   edit: () => <path d="M4 20h4L19 9l-4-4L4 16Z M13.5 6.5l4 4" />,
   clip: () => <><rect x="5" y="4.5" width="14" height="16.5" rx="2.5" /><rect class="r" x="9" y="2.8" width="6" height="3.6" rx="1" /><path d="M8.5 11h7M8.5 14.5h5" /></>,
 };
@@ -132,7 +136,7 @@ export default function TopBar(p) {
       </div>
       <div class="cg">
         <Pill locked={p.locked} icon="clip" label="Clips" aria="Clipboard history" title="Clipboard history: paste a recent copy into the open chat" on={p.clipOpen} pressed={p.clipOpen} testid="tb-clip" onClick={p.onClip} />
-        <Pill locked={p.locked} icon="folder" label="Files" aria="Open downloads folder" title="Open this account's downloads folder" testid="tb-downloads" onClick={p.onDownloads} />
+        <Pill locked={p.locked} icon="folder" label="Files" aria="Downloaded files" title="Downloaded files" on={p.filesOpen} pressed={p.filesOpen} testid="tb-downloads" onClick={p.onDownloads} />
         <Pill locked={p.locked} icon="lock" label="Lock" aria="Lock now" title="Lock now" testid="rail-lock" onClick={p.onLock} />
       </div>
       <div class="cg">

@@ -5,6 +5,7 @@ import Settings from "./Settings.jsx";
 import Lock from "./Lock.jsx";
 import Home from "./Home.jsx";
 import Clips from "./Clips.jsx";
+import Files from "./Files.jsx";
 import { api, on } from "./ipc.js";
 
 const quiet = (p) => p.catch(() => {});
@@ -25,9 +26,10 @@ export default function App() {
   const [accts, setAccts] = createSignal({ accounts: [], active: null, live: [] });
   const [removing, setRemoving] = createSignal(null); // account awaiting remove confirmation
   const [clipOpen, setClipOpen] = createSignal(false); // clipboard history popover
+  const [filesOpen, setFilesOpen] = createSignal(false); // download file manager
   const locked = () => lockInfo().locked;
   // Nothing stays open over the lock screen: popovers, Settings and the remove dialog close when it locks.
-  createEffect(() => { if (locked()) { setClipOpen(false); setSettingsOpen(false); setRemoving(null); } });
+  createEffect(() => { if (locked()) { setClipOpen(false); setSettingsOpen(false); setFilesOpen(false); setRemoving(null); } });
   const [leaving, setLeaving] = createSignal(false); // the lock screen's exit animation is playing over the unlocked app
 
   const refreshLock = async () => setLockInfo(await api.lockStatus());
@@ -55,15 +57,15 @@ export default function App() {
   });
 
   // Home covers the content hole when asked for, and whenever no account is active.
-  const homeShown = () => !settingsOpen() && (home() || !accts().active);
+  const homeShown = () => !settingsOpen() && !filesOpen() && (home() || !accts().active);
   // Main hides the account view while an overlay (settings, home, lock, dialog) is open.
-  createEffect(() => quiet(api.setOverlay(settingsOpen() || homeShown() || locked() || leaving() || !!removing() || clipOpen())));
+  createEffect(() => quiet(api.setOverlay(settingsOpen() || filesOpen() || homeShown() || locked() || leaving() || !!removing() || clipOpen())));
 
   async function lockNow() {
     try { await api.lockNow(); } catch { setPinAsk((n) => n + 1); setSettingsOpen(true); } // no PIN yet: Settings > Lock, cursor in the PIN field
   }
   const addAccount = (service) => { setSettingsOpen(false); setHome(false); quiet(api.addAccount(service)); };
-  const openAccount = (id) => { setSettingsOpen(false); setHome(false); quiet(api.activateAccount(id)); };
+  const openAccount = (id) => { setSettingsOpen(false); setFilesOpen(false); setHome(false); quiet(api.activateAccount(id)); };
   const askRemove = (id) => !locked() && setRemoving(accts().accounts.find((a) => a.id === id) ?? null);
 
   const onKey = (e) => {
@@ -98,16 +100,16 @@ export default function App() {
         <TopBar
           accounts={accts().accounts} active={accts().active}
           blur={settings().blur} panelOpen={settings().panel_open} agentOn={agentOn()} agentWatch={agent().watch} settingsOpen={settingsOpen()} home={homeShown()}
-          onHome={() => { setSettingsOpen(false); setHome(true); }}
+          onHome={() => { setSettingsOpen(false); setFilesOpen(false); setHome(true); }}
           onSelect={openAccount}
           onRemove={askRemove}
           onBlur={() => quiet(api.toggleBlur())}
           onColumn={(col, v) => quiet(update((d) => { d.blur[col] = v; d.blur.enabled = d.blur.list && d.blur.chat; }))}
           onPanel={() => quiet(api.setPanel(!settings().panel_open))}
           onLock={lockNow}
-          onSettings={() => setSettingsOpen(!settingsOpen())}
+          onSettings={() => { setFilesOpen(false); setSettingsOpen(!settingsOpen()); }}
           clipOpen={clipOpen()} onClip={() => setClipOpen(!clipOpen())}
-          onDownloads={() => quiet(api.openDownloads())}
+          filesOpen={filesOpen()} onDownloads={() => { setSettingsOpen(false); setFilesOpen(!filesOpen()); }}
           locked={locked() || leaving()}
         />
         <Show when={clipOpen() && !locked()}>
@@ -117,6 +119,9 @@ export default function App() {
           <Show when={settingsOpen()}>
             <Settings settings={settings} update={update} agent={agent} hasKey={hasKey} setHasKey={setHasKey}
               lockInfo={lockInfo} refreshLock={refreshLock} pinAsk={pinAsk} aiAsk={aiAsk} onClose={() => setSettingsOpen(false)} />
+          </Show>
+          <Show when={filesOpen()}>
+            <Files onClose={() => setFilesOpen(false)} />
           </Show>
           <Show when={homeShown()}>
             <Home accounts={accts().accounts} active={accts().active} live={accts().live} blur={settings().blur}

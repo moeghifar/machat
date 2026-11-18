@@ -144,6 +144,23 @@ export function acctFolder(a) {
 }
 
 /**
+ * Resolves `rel` inside `base` and returns the absolute path, or throws if it lands outside (`..`, an absolute
+ * path, or a symlink pointing out). Every file-manager command goes through this.
+ */
+export function confine(base, rel = '') {
+  if (typeof rel !== 'string' || rel.includes('\0')) throw new Error('invalid path');
+  const root = path.resolve(base);
+  const p = path.resolve(root, rel);
+  const inside = (r, x) => { const d = path.relative(r, x); return d === '' || (!d.startsWith('..') && !path.isAbsolute(d)); };
+  if (!inside(root, p)) throw new Error('outside the download folder');
+  // Symlinks: check the real path of the nearest existing ancestor (the path itself may not exist yet, e.g. a rename target).
+  let q = p;
+  while (!fs.existsSync(q) && q !== root) q = path.dirname(q);
+  if (fs.existsSync(root) && !inside(fs.realpathSync(root), fs.realpathSync(q))) throw new Error('outside the download folder');
+  return p;
+}
+
+/**
  * Data folder: <appData>/machat. Moves the old <appData>/dev.moeghifar.machat-web there once (same disk, one rename),
  * unless the old folder is in use by a running copy (its SingletonLock exists), in which case the old folder is used
  * this time and the move happens on a later start. A stray, settings-less <appData>/machat is set aside, not deleted.

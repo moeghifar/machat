@@ -794,3 +794,16 @@ textarea.input { resize: vertical; min-height: 72px; line-height: 1.5; }
 .ar-log { max-height: 640px; overflow-y: auto; }
 .ar-in, .ar-out { margin: 0; font-size: var(--fs-sm); overflow-wrap: anywhere; }
 .badge.bad { color: var(--danger); }
+
+/* Files: the download manager overlay (reuses .home, .row, .btn, .input) */
+.files { z-index: 2; }
+.files-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--sp-4); flex-wrap: wrap; }
+.files-crumbs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 10px; color: var(--text-2); }
+.files-tools { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.files-tools > input { flex: 1; min-width: 180px; }
+.files-tools > select { width: auto; }
+.files-name { all: unset; cursor: pointer; font-weight: 550; overflow-wrap: anywhere; }
+.files-name:hover { color: var(--accent-text); text-decoration: underline; }
+.files-name:focus-visible { box-shadow: var(--focus-ring); border-radius: 4px; }
+.files-acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.files-err { margin: 0; color: var(--danger); font-size: var(--fs-sm); }
