@@ -1,5 +1,6 @@
 // Shell command table (same snake_case names as src-tauri/src/commands.rs) and the ipc handlers.
 import { ipcMain, dialog, utilityProcess, Notification, shell } from 'electron';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fromShell } from './settings.js';
@@ -316,6 +317,14 @@ export function registerIpc(m) {
       if (!anyMode()) { ag.proc?.kill(); ag.proc = null; }
       if (!r) throw new Error('matcher not available');
       return rules.map((_, i) => ({ match: r.hits.find((h) => h.rule === i)?.match ?? null, timeout: r.timeouts.includes(i) }));
+    },
+    rename_account: ({ id, name }) => m.accts.rename(id, name),
+    // The active account's download folder (created if missing), else the base folder.
+    open_downloads: async () => {
+      const dir = m.accts.downloadDir(m.state.active);
+      fs.mkdirSync(dir, { recursive: true });
+      const err = await shell.openPath(dir);
+      if (err) throw new Error(err);
     },
     pick_folder: async () => {
       const r = await dialog.showOpenDialog(m.win(), { title: 'Download folder', properties: ['openDirectory', 'createDirectory'] });

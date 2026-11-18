@@ -1,7 +1,7 @@
 import { createSignal, createEffect, onCleanup, For, Show } from "solid-js";
 import { api, aiTest, IDLE } from "./ipc.js";
 import { getTheme, setTheme, THEMES } from "./theme.js";
-import { Icon } from "./TopBar.jsx";
+import { Icon, acctName } from "./TopBar.jsx";
 import Prompts from "./Prompts.jsx";
 import AutoReply from "./AutoReply.jsx";
 
@@ -252,7 +252,7 @@ function Memory(p) {
   load();
   const t = setInterval(load, 3000);
   onCleanup(() => clearInterval(t));
-  const name = (id) => { const a = p.accounts.find((x) => x.id === id); return a ? `${a.service === "telegram" ? "Telegram" : "WhatsApp"} ${a.n}` : "Account"; };
+  const name = (id) => { const a = p.accounts.find((x) => x.id === id); return a ? acctName(a) : "Account"; };
   return (
     <div class="row" data-testid="perf-memory">
       <div class="row-text">

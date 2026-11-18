@@ -132,3 +132,13 @@ export function winAct({ maximized, fullscreen }, wasMax, f11 = false) {
   if (f11) return 'enter-fs';
   return maximized ? 'unmaximize' : 'maximize';
 }
+
+export const NAME_MAX = 40;
+const SERVICE_LABEL = { whatsapp: 'WhatsApp', telegram: 'Telegram' };
+/** Display name: the user's name for the account, or "WhatsApp 2". */
+export const acctLabel = (a) => (a?.name?.trim() || `${SERVICE_LABEL[a?.service] ?? 'Account'} ${a?.n ?? ''}`.trim());
+/** One safe folder name per account, for its downloads: no separators, reserved characters or dot-only names. */
+export function acctFolder(a) {
+  const f = acctLabel(a).replace(/[\u0000-\u001f\u007f-\u009f<>:"/\\|?*]/g, '_').replace(/[. ]+$/, '').replace(/^\.+/, '').trim();
+  return f || `account-${a?.n ?? 0}`;
+}

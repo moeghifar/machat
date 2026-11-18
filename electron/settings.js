@@ -1,7 +1,7 @@
 // Settings model, validation and atomic persistence. Port of src-tauri/src/settings.rs. Pure: no electron import.
 import fs from 'node:fs';
 import path from 'node:path';
-import { validId, validEndpoint } from './util.js';
+import { validId, validEndpoint, NAME_MAX } from './util.js';
 import { validateRules } from './agent-core.js';
 import { validateAuto } from './autoreply.js';
 
@@ -66,7 +66,7 @@ function fill(raw) {
     if (!Array.isArray(raw[k])) return null;
     d[k] = raw[k];
   }
-  d.accounts = d.accounts.map((a) => (isObj(a) ? { id: a.id, n: a.n, service: a.service ?? 'whatsapp' } : a));
+  d.accounts = d.accounts.map((a) => (isObj(a) ? { id: a.id, n: a.n, service: a.service ?? 'whatsapp', ...(typeof a.name === 'string' && a.name ? { name: a.name } : {}) } : a));
   return d;
 }
 
@@ -90,7 +90,8 @@ export function validate(s) {
   validateAuto(s.autoreply);
   const a = s.accounts;
   if (a.length > MAX_ACCOUNTS
-    || a.some((x) => !isObj(x) || !validId(x.id) || !Number.isInteger(x.n) || x.n <= 0 || !SERVICES.includes(x.service))
+    || a.some((x) => !isObj(x) || !validId(x.id) || !Number.isInteger(x.n) || x.n <= 0 || !SERVICES.includes(x.service)
+      || (x.name !== undefined && (typeof x.name !== 'string' || chars(x.name) > NAME_MAX || ctrl(x.name))))
     || a.some((x, i) => a.slice(0, i).some((y) => y.id === x.id || y.n === x.n))) throw new Error('invalid accounts');
   if (!Array.isArray(s.removed) || !s.removed.every(validId)) throw new Error('invalid accounts');
 }

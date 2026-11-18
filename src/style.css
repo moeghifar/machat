@@ -432,6 +432,11 @@ textarea.input { resize: vertical; min-height: 72px; line-height: 1.5; }
 .acc-logo { width: 40px; height: 40px; flex: none; }
 .acc-name { font-size: 15px; font-weight: 650; }
 .acc-plat { font-size: var(--fs-xs); color: var(--text-2); }
+.acc-id { min-width: 0; flex: 1; }
+.acc-rename { display: flex; align-items: center; gap: 6px; max-width: 100%; padding: 0; border: 0; background: none; color: inherit; font-family: inherit; cursor: text; text-align: left; }
+.acc-rename svg { width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; opacity: 0; transition: opacity var(--t-fast) var(--ease); }
+.acc-card:hover .acc-rename svg, .acc-rename:focus-visible svg { opacity: .6; }
+.acc-name-input { width: 100%; font: inherit; font-size: 15px; font-weight: 650; padding: 2px 6px; margin: -3px -7px; border: 1px solid var(--accent); border-radius: 8px; background: var(--surface); color: var(--text); outline: none; }
 .acc-st { display: flex; align-items: center; gap: 7px; font-size: var(--fs-xs); color: var(--text-2); }
 .acc-st i { width: 7px; height: 7px; border-radius: 50%; background: var(--switch-off); }
 .acc-st i.live { background: var(--accent); }

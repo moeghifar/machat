@@ -3,7 +3,7 @@ import { api, on, win } from "./ipc.js";
 import { maxButton } from "./winstate.js";
 
 export const SERVICE_NAME = { whatsapp: "WhatsApp", telegram: "Telegram" };
-export const acctName = (a) => `${SERVICE_NAME[a.service] ?? "Account"} ${a.n}`;
+export const acctName = (a) => a.name?.trim() || `${SERVICE_NAME[a.service] ?? "Account"} ${a.n}`;
 
 // Machat mark (src-tauri/icons/logo.svg), "Twin shackle m": two lock shackles read as an m, over a
 // lime chat bubble with a tea-leaf keyhole. Flat, fixed brand colours in both themes.
@@ -48,6 +48,8 @@ export const ICONS = {
   listen: () => <><path d="M5 4.5h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3v-3H5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z" /><circle class="r" cx="8" cy="11" r="1.2" /><circle class="r" cx="12" cy="11" r="1.2" /><circle class="r" cx="16" cy="11" r="1.2" /></>,
   queue: () => <><path d="M9 6.5h11M9 12h11M9 17.5h11" /><circle class="r" cx="4.6" cy="6.5" r="1.4" /><circle class="r" cx="4.6" cy="12" r="1.4" /><circle class="r" cx="4.6" cy="17.5" r="1.4" /></>,
   watch: () => <><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></>,
+  folder: () => <><path d="M3 7.5a2 2 0 0 1 2-2h4.2l2 2.2H19a2 2 0 0 1 2 2v8.3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" /><path class="r" d="M12 11v5M9.8 13.8 12 16l2.2-2.2" /></>,
+  edit: () => <path d="M4 20h4L19 9l-4-4L4 16Z M13.5 6.5l4 4" />,
   clip: () => <><rect x="5" y="4.5" width="14" height="16.5" rx="2.5" /><rect class="r" x="9" y="2.8" width="6" height="3.6" rx="1" /><path d="M8.5 11h7M8.5 14.5h5" /></>,
 };
 export const Icon = (p) => (
@@ -130,6 +132,7 @@ export default function TopBar(p) {
       </div>
       <div class="cg">
         <Pill icon="clip" label="Clips" aria="Clipboard history" title="Clipboard history: paste a recent copy into the open chat" on={p.clipOpen} pressed={p.clipOpen} testid="tb-clip" onClick={p.onClip} />
+        <Pill icon="folder" label="Files" aria="Open downloads folder" title="Open this account's downloads folder" testid="tb-downloads" onClick={p.onDownloads} />
         <Pill icon="lock" label="Lock" aria="Lock now" title="Lock now" testid="rail-lock" onClick={p.onLock} />
       </div>
       <div class="cg">

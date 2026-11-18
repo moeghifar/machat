@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 import { acctName, SERVICE_NAME, ServiceIcon, Icon } from "./TopBar.jsx";
 
 const PLATFORMS = [
@@ -13,6 +13,7 @@ const censorSummary = (b) =>
 export default function Home(p) {
   const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
   const n = () => p.accounts.length;
+  const [editing, setEditing] = createSignal(null); // account id whose name is being edited
   return (
     <section class="home" aria-label="Home" data-testid="empty-state">
       <div class="home-inner">
@@ -33,7 +34,20 @@ export default function Home(p) {
                   <div class="acc-card" classList={{ sel: p.active === a.id }} data-testid={`home-acct-${a.n}`}>
                     <div class="acc-top">
                       <ServiceIcon service={a.service} class="acc-logo" />
-                      <div><div class="acc-name">{acctName(a)}</div><div class="acc-plat">{SERVICE_NAME[a.service]}</div></div>
+                      <div class="acc-id">
+                        <Show when={editing() === a.id} fallback={
+                          <button type="button" class="acc-name acc-rename" title="Rename" aria-label={`Rename ${acctName(a)}`}
+                            onClick={() => setEditing(a.id)} data-testid={`home-rename-${a.n}`}>
+                            {acctName(a)}<Icon name="edit" />
+                          </button>
+                        }>
+                          <input class="acc-name-input" maxLength={40} value={a.name ?? ""} placeholder={`${SERVICE_NAME[a.service]} ${a.n}`}
+                            aria-label="Account name" data-testid={`home-name-${a.n}`} ref={(el) => queueMicrotask(() => el.focus())}
+                            onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); if (e.key === "Escape") { e.currentTarget.value = a.name ?? ""; e.currentTarget.blur(); } }}
+                            onBlur={(e) => { const v = e.currentTarget.value.trim(); setEditing(null); if (v !== (a.name ?? "")) p.onRename(a.id, v); }} />
+                        </Show>
+                        <div class="acc-plat">{SERVICE_NAME[a.service]}</div>
+                      </div>
                     </div>
                     <div class="acc-st"><i classList={{ live: p.live.includes(a.id) }} />{p.live.includes(a.id) ? "Open in this session" : "Not opened yet"}</div>
                     <div class="acc-actions">

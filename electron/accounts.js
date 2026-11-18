@@ -3,7 +3,7 @@ import { WebContentsView, Menu, session, shell, dialog, desktopCapturer, clipboa
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { validId, navDecision, serviceUrl, downloadTarget, permitted, accountUA, viewRect, MEDIA_WORDS, safeExternal, idleIds } from './util.js';
+import { validId, navDecision, serviceUrl, downloadTarget, permitted, accountUA, viewRect, MEDIA_WORDS, safeExternal, idleIds, acctFolder, acctLabel, NAME_MAX } from './util.js';
 import { MAX_ACCOUNTS, validate } from './settings.js';
 
 const read = (root, files) => files.map((f) => fs.readFileSync(path.join(root, 'inject', f + '.js'), 'utf8')).join('\n');
@@ -64,7 +64,7 @@ export function makeAccounts(ctx) {
     if (!grants.has(k)) {
       grants.set(k, dialog.showMessageBox(ctx.win(), {
         type: 'question', buttons: ['Block', 'Allow'], defaultId: 0, cancelId: 0, noLink: true,
-        message: `Allow ${a?.service === 'telegram' ? 'Telegram' : 'WhatsApp'} ${a?.n ?? ''} to ${what}?`, detail: 'Your answer is kept until Machat restarts.',
+        message: `Allow ${acctLabel(a)} to ${what}?`, detail: 'Your answer is kept until Machat restarts.',
       }).then((r) => { const ok = r.response === 1; if (ok) granted.add(k); return ok; }, () => false));
     }
     return grants.get(k);
@@ -97,7 +97,7 @@ export function makeAccounts(ctx) {
       try { cb(src ? { video: src } : null); } catch { /* null refuses; cb throws when the frame is gone */ }
     });
     ses.on('will-download', (_e, item) => {
-      const dir = ctx.settings().download_dir || path.join(ctx.downloads, 'machat');
+      const dir = downloadDir(id);
       let p = null;
       try { fs.mkdirSync(dir, { recursive: true }); p = downloadTarget(dir, item.getFilename()); } catch {}
       if (!p) return item.cancel();
@@ -218,6 +218,26 @@ export function makeAccounts(ctx) {
     emit();
   }
 
+  /** Base download folder (setting, or Downloads/machat); with an id, that account's own subfolder. */
+  function downloadDir(id) {
+    const base = ctx.settings().download_dir || path.join(ctx.downloads, 'machat');
+    const a = id && find(id);
+    return a ? path.join(base, acctFolder(a)) : base;
+  }
+
+  function rename(id, name) {
+    if (!validId(id) || !find(id)) throw new Error('unknown account');
+    const v = String(name ?? '').replace(/\s+/g, ' ').trim();
+    if ([...v].length > NAME_MAX) throw new Error('name is too long');
+    const s = structuredClone(ctx.settings());
+    const a = s.accounts.find((x) => x.id === id);
+    if (v) a.name = v; else delete a.name;
+    validate(s);
+    ctx.commit(s);
+    emit();
+    return a;
+  }
+
   function add(service) {
     if (service !== 'whatsapp' && service !== 'telegram') throw new Error('invalid service');
     const s = structuredClone(ctx.settings());
@@ -260,5 +280,5 @@ export function makeAccounts(ctx) {
     return { ...s, removed: [] };
   }
 
-  return { snapshot, emit, layout, push, initFor, isAccount, activate, add, remove, sweep, views, suspend, sweepIdle };
+  return { snapshot, emit, layout, push, initFor, isAccount, activate, add, remove, rename, downloadDir, sweep, views, suspend, sweepIdle };
 }

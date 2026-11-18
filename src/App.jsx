@@ -105,6 +105,7 @@ export default function App() {
           onLock={lockNow}
           onSettings={() => setSettingsOpen(!settingsOpen())}
           clipOpen={clipOpen()} onClip={() => setClipOpen(!clipOpen())}
+          onDownloads={() => quiet(api.openDownloads())}
         />
         <Show when={clipOpen() && !locked()}>
           <Clips watch={settings().clip.watch} onClose={() => setClipOpen(false)} />
@@ -116,7 +117,7 @@ export default function App() {
           </Show>
           <Show when={homeShown()}>
             <Home accounts={accts().accounts} active={accts().active} live={accts().live} blur={settings().blur}
-              onOpen={openAccount} onAdd={addAccount} onRemove={askRemove} />
+              onOpen={openAccount} onAdd={addAccount} onRemove={askRemove} onRename={(id, name) => quiet(api.renameAccount(id, name))} />
           </Show>
           <Show when={removing()}>
             <div class="dialog">

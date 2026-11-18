@@ -32,8 +32,12 @@
       "electron/**",
       "inject/**",
       "prompts/**",
-      "package.json"
+      "package.json",
+      "!electron/scenario*.js",
+      "!dist/assets/*.woff"
     ],
+    "electronLanguages": ["en-US", "id"],
+    "compression": "maximum",
     "directories": {
       "output": "release"
     },
