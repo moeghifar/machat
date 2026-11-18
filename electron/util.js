@@ -149,11 +149,16 @@ export const NAME_MAX = 40;
 const SERVICE_LABEL = { whatsapp: 'WhatsApp', telegram: 'Telegram', discord: 'Discord', slack: 'Slack', mattermost: 'Mattermost' };
 /** Display name: the user's name for the account, or "WhatsApp 2". */
 export const acctLabel = (a) => (a?.name?.trim() || `${SERVICE_LABEL[a?.service] ?? 'Account'} ${a?.n ?? ''}`.trim());
-/** One safe folder name per account, for its downloads: no separators, reserved characters or dot-only names. */
+/**
+ * Download folder per account: "<name with spaces as __>-<8 chars of the account id>", e.g. "Sales__Team-k3j9x0qa".
+ * The suffix never changes, so a rename only swaps the name part (see accounts.rename, which moves the folder).
+ */
 export function acctFolder(a) {
-  const f = acctLabel(a).replace(/[\u0000-\u001f\u007f-\u009f<>:"/\\|?*]/g, '_').replace(/[. ]+$/, '').replace(/^\.+/, '').trim();
-  return f || `account-${a?.n ?? 0}`;
+  const f = acctLabel(a).replace(/[\u0000-\u001f\u007f-\u009f<>:"/\\|?*]/g, '-').replace(/[. ]+$/, '').replace(/^[. ]+/, '').replace(/ /g, '__');
+  return `${f || 'account'}-${String(a?.id ?? '').slice(0, 8)}`;
 }
+/** The pre-0.0.3 folder name (label only), so old downloads can be moved into the new folder. */
+export const legacyFolder = (a) => acctLabel(a).replace(/[\u0000-\u001f\u007f-\u009f<>:"/\\|?*]/g, '_').replace(/[. ]+$/, '').replace(/^\.+/, '').trim() || `account-${a?.n ?? 0}`;
 
 /**
  * Resolves `rel` inside `base` and returns the absolute path, or throws if it lands outside (`..`, an absolute

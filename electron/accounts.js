@@ -3,7 +3,7 @@ import { WebContentsView, Menu, session, shell, dialog, desktopCapturer, clipboa
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { validId, navDecision, serviceUrl, validServerUrl, AUTH_DOMAINS, SERVICES, downloadTarget, permitted, accountUA, viewRect, MEDIA_WORDS, safeExternal, idleIds, acctFolder, acctLabel, NAME_MAX } from './util.js';
+import { validId, navDecision, serviceUrl, validServerUrl, AUTH_DOMAINS, SERVICES, downloadTarget, permitted, accountUA, viewRect, MEDIA_WORDS, safeExternal, idleIds, acctFolder, legacyFolder, acctLabel, NAME_MAX } from './util.js';
 import { MAX_ACCOUNTS, validate } from './settings.js';
 
 const read = (root, files) => files.map((f) => fs.readFileSync(path.join(root, 'inject', f + '.js'), 'utf8')).join('\n');
@@ -230,18 +230,28 @@ export function makeAccounts(ctx) {
   function downloadDir(id) {
     const base = ctx.settings().download_dir || path.join(ctx.downloads, 'machat');
     const a = id && find(id);
-    return a ? path.join(base, acctFolder(a)) : base;
+    if (!a) return base;
+    const dir = path.join(base, acctFolder(a));
+    moveDir(path.join(base, legacyFolder(a)), dir); // old "<label>" folder from earlier versions
+    return dir;
+  }
+  /** Renames from → to when only `from` exists; never merges or overwrites, so no download goes missing. */
+  function moveDir(from, to) {
+    try { if (from !== to && fs.existsSync(from) && !fs.existsSync(to)) fs.renameSync(from, to); } catch {}
   }
 
   function rename(id, name) {
     if (!validId(id) || !find(id)) throw new Error('unknown account');
     const v = String(name ?? '').replace(/\s+/g, ' ').trim();
     if ([...v].length > NAME_MAX) throw new Error('name is too long');
+    if (v.includes('__')) throw new Error('name cannot contain __');
+    const before = downloadDir(id);
     const s = structuredClone(ctx.settings());
     const a = s.accounts.find((x) => x.id === id);
     if (v) a.name = v; else delete a.name;
     validate(s);
     ctx.commit(s);
+    moveDir(before, downloadDir(id));
     emit();
     return a;
   }

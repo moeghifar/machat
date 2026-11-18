@@ -57,7 +57,7 @@ export default function Home(p) {
                           </button>
                         }>
                           <input class="acc-name-input" maxLength={40} value={a.name ?? ""} placeholder={`${SERVICE_NAME[a.service]} ${a.n}`}
-                            aria-label="Account name" data-testid={`home-name-${a.n}`} ref={(el) => queueMicrotask(() => el.focus())}
+                            aria-label="Account name" onInput={(e) => { const v = e.currentTarget.value.replace(/_{2,}/g, "_"); if (v !== e.currentTarget.value) e.currentTarget.value = v; }} data-testid={`home-name-${a.n}`} ref={(el) => queueMicrotask(() => el.focus())}
                             onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); if (e.key === "Escape") { e.currentTarget.value = a.name ?? ""; e.currentTarget.blur(); } }}
                             onBlur={(e) => { const v = e.currentTarget.value.trim(); setEditing(null); if (v !== (a.name ?? "")) p.onRename(a.id, v); }} />
                         </Show>

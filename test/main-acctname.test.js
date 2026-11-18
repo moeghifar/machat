@@ -15,12 +15,15 @@ test('label: own name, else service and number', () => {
   assert.equal(acctLabel({ ...wa(), service: 'telegram' }), 'Telegram 2');
 });
 
-test('folder: one safe path segment', () => {
-  assert.equal(acctFolder(wa()), 'WhatsApp 2');
-  assert.equal(acctFolder(wa({ name: 'Sales / ID' })), 'Sales _ ID');
-  assert.equal(acctFolder(wa({ name: '..' })), 'account-2');
-  assert.equal(acctFolder(wa({ name: 'a:b*c?' })), 'a_b_c_');
-  assert.equal(acctFolder(wa({ name: 'trail. ' })), 'trail');
+test('folder: "<name, spaces as __>-<8 id chars>", one safe path segment', () => {
+  const x = { id: 'k3j9x0qaZZZZ' };
+  assert.equal(acctFolder(wa(x)), 'WhatsApp__2-k3j9x0qa');
+  assert.equal(acctFolder(wa({ ...x, name: 'Sales Team' })), 'Sales__Team-k3j9x0qa');
+  assert.equal(acctFolder(wa({ ...x, name: 'Sales / ID' })), 'Sales__-__ID-k3j9x0qa');
+  assert.equal(acctFolder(wa({ ...x, name: '..' })), 'account-k3j9x0qa');
+  assert.equal(acctFolder(wa({ ...x, name: 'trail. ' })), 'trail-k3j9x0qa');
+  const s = defaults(); s.accounts = [wa({ name: 'a__b' })];
+  assert.throws(() => validate(s), /invalid accounts/);
   for (const n of ['../x', 'C:\\x', '/etc']) assert.ok(!/[/\\]/.test(acctFolder(wa({ name: n }))), n);
 });
 

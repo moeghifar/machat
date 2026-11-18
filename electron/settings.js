@@ -92,7 +92,7 @@ export function validate(s) {
   if (a.length > MAX_ACCOUNTS
     || a.some((x) => !isObj(x) || !validId(x.id) || !Number.isInteger(x.n) || x.n <= 0 || !SERVICES.includes(x.service)
       || (x.service === 'mattermost' ? !validServerUrl(x.url) : x.url !== undefined)
-      || (x.name !== undefined && (typeof x.name !== 'string' || chars(x.name) > NAME_MAX || ctrl(x.name))))
+      || (x.name !== undefined && (typeof x.name !== 'string' || chars(x.name) > NAME_MAX || ctrl(x.name) || x.name.includes('__'))))
     || a.some((x, i) => a.slice(0, i).some((y) => y.id === x.id || y.n === x.n))) throw new Error('invalid accounts');
   if (!Array.isArray(s.removed) || !s.removed.every(validId)) throw new Error('invalid accounts');
 }
