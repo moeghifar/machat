@@ -114,7 +114,7 @@ function LockPreview(p) {
   return (
     <div class="pv">
       <div class="pv-head"><b>Lock screen preview</b><span class="live"><i />{p.anim ? "animated" : "still"}</span></div>
-      <div class="lkp" classList={{ still: !p.anim }}>
+      <div class="lkp" classList={{ still: !p.anim }} data-style={p.lockStyle}>
         <div class="lkp-card">
           <div class="lkp-ring"><svg viewBox="0 0 32 32"><rect x="7" y="14" width="18" height="13" rx="3" /><path class="shackle" d="M11 14v-3a5 5 0 0 1 10 0v3" /></svg></div>
           <div class="lkp-title">Machat is locked</div>
@@ -594,12 +594,16 @@ export default function Settings(p) {
                 <Seg label="Lock screen animation" options={[["on", "Animated"], ["off", "Still"]]} value={s().lock.anim ? "on" : "off"} testid="lock-anim"
                   onChange={(v) => patch((d) => { d.lock.anim = v === "on"; })} />
               </Row>
+              <Row label="Lock screen style" hint="Ring: the logo's ring fills as you type. Glass: a frosted card with your account names. Split: a clock panel on wide windows.">
+                <Seg label="Lock screen style" options={[["classic", "Classic"], ["ring", "Ring"], ["glass", "Glass"], ["split", "Split"]]} value={s().lock.style} testid="lock-style"
+                  onChange={(v) => patch((d) => { d.lock.style = v; })} />
+              </Row>
             </div>
             <div class="key-form">
               <button type="button" class="btn primary" disabled={!p.lockInfo().has_pin} onClick={() => api.lockNow().catch((e) => setErr(String(e)))} data-testid="lock-now"><Icon name="lock" />Lock now</button>
             </div>
           </div>
-          <div class="scol"><LockPreview anim={s().lock.anim} pw={pw()} /></div>
+          <div class="scol"><LockPreview anim={s().lock.anim} pw={pw()} lockStyle={s().lock.style} /></div>
         </div>
 
         <div class="sgrid one" hidden={tab() !== "general"}>

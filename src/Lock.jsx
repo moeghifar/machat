@@ -1,8 +1,10 @@
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { api } from "./ipc.js";
+import { ServiceIcon, acctName } from "./TopBar.jsx";
 
 const BACKOFF_S = 30; // matches the Rust backoff after 5 failures
 const OPEN_MS = 620; // the unlock transition; 0 when still
+const SEGS = 12; // "ring" style: one segment per typed character, capped here for long passwords
 
 // Full-window lock screen (below the title bar). Rust hides `wa` while locked; the parent calls onUnlocked
 // after the `lock` event or a successful unlock. `method` is "pin" (4-12 digits) or "password" (8+ characters).
@@ -22,6 +24,8 @@ export default function Lock(props) {
   const moving = () => props.anim && !calm();
   const pw = () => props.method === "password";
   const min = () => (pw() ? 8 : 4);
+  const st = () => props.lockStyle ?? "classic"; // classic, ring, glass or split (CSS: .lock[data-style])
+  const filled = () => (open() ? SEGS : Math.min(pin().length, SEGS));
   let timer, input, root, raf = 0;
 
   const onCalm = (e) => setCalm(e.matches);
@@ -81,7 +85,7 @@ export default function Lock(props) {
   const date = () => now().toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <div ref={root} class="lock" classList={{ still: !moving(), paused: hidden(), opening: open() }} onPointerMove={onMove}
+    <div ref={root} class="lock" data-style={st()} classList={{ still: !moving(), paused: hidden(), opening: open() }} onPointerMove={onMove}
       role="dialog" aria-modal="true" aria-label="App locked" data-testid="lock-screen">
       <div class="lock-bg" aria-hidden="true">
         <div class="lock-layer l1"><i class="blob b1" /></div>
@@ -90,7 +94,7 @@ export default function Lock(props) {
         <svg class="lock-grain"><filter id="lock-grain"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" stitchTiles="stitch" /><feColorMatrix values="0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0" /></filter><rect width="100%" height="100%" filter="url(#lock-grain)" /></svg>
       </div>
       <div class="lock-stage">
-        <div class="lock-clock" aria-hidden="true"><div class="lock-time">{time()}<Show when={period()}><span class="lock-ampm">{period()}</span></Show></div><div class="lock-date">{date()}</div></div>
+        <div class="lock-clock" aria-hidden="true"><div class="lock-time">{time()}<Show when={period()}><span class="lock-ampm">{period()}</span></Show></div><div class="lock-date">{date()}</div><p class="lock-calm">Your chats are resting. Unlock when you are ready.</p></div>
         <form class="lock-card" classList={{ shake: shake() }} onSubmit={submit}>
           <div class="lock-mark" classList={{ wait: !!wait() }} aria-hidden="true">
             <svg class="lock-ring" viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="46" /><circle class="left" cx="50" cy="50" r="46" pathLength="1" style={{ "stroke-dashoffset": 1 - wait() / BACKOFF_S }} /></svg>
@@ -102,8 +106,20 @@ export default function Lock(props) {
                 <path class="lm-leaf" d="M256 262c34 20 34 70 0 96-34-26-34-76 0-96Z" />
               </g>
             </svg>
+            <Show when={st() === "ring"}>
+              <svg class="seg-ring" viewBox="0 0 100 100">
+                <For each={Array.from({ length: SEGS }, (_, i) => i)}>
+                  {(i) => <circle classList={{ on: i < filled() }} cx="50" cy="50" r="46" pathLength={SEGS} style={{ "stroke-dashoffset": -(i + 0.1) }} />}
+                </For>
+              </svg>
+            </Show>
             <Show when={wait()}><span class="lock-count">{wait()}</span></Show>
           </div>
+          <Show when={st() === "glass" && props.accounts?.length}>
+            <ul class="lock-accts" aria-label="Accounts">
+              <For each={props.accounts}>{(a) => <li><ServiceIcon service={a.service} /><span>{acctName(a)}</span></li>}</For>
+            </ul>
+          </Show>
           <h1 class="lock-title">Machat is locked</h1>
           <div class="pin-wrap" classList={{ pw: pw(), bad: !!bad() }}>
             <Show when={!pw()}>

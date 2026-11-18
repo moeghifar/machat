@@ -26,7 +26,8 @@ export default function App() {
   const [removing, setRemoving] = createSignal(null); // account awaiting remove confirmation
   const [clipOpen, setClipOpen] = createSignal(false); // clipboard history popover
   const locked = () => lockInfo().locked;
-  createEffect(() => { if (locked()) setClipOpen(false); });
+  // Nothing stays open over the lock screen: popovers, Settings and the remove dialog close when it locks.
+  createEffect(() => { if (locked()) { setClipOpen(false); setSettingsOpen(false); setRemoving(null); } });
   const [leaving, setLeaving] = createSignal(false); // the lock screen's exit animation is playing over the unlocked app
 
   const refreshLock = async () => setLockInfo(await api.lockStatus());
@@ -63,9 +64,10 @@ export default function App() {
   }
   const addAccount = (service) => { setSettingsOpen(false); setHome(false); quiet(api.addAccount(service)); };
   const openAccount = (id) => { setSettingsOpen(false); setHome(false); quiet(api.activateAccount(id)); };
-  const askRemove = (id) => setRemoving(accts().accounts.find((a) => a.id === id) ?? null);
+  const askRemove = (id) => !locked() && setRemoving(accts().accounts.find((a) => a.id === id) ?? null);
 
   const onKey = (e) => {
+    if (locked()) return; // top-bar shortcuts wait for unlock (main refuses the commands anyway)
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "x") {
       e.preventDefault();
       quiet(api.toggleBlur());
@@ -106,6 +108,7 @@ export default function App() {
           onSettings={() => setSettingsOpen(!settingsOpen())}
           clipOpen={clipOpen()} onClip={() => setClipOpen(!clipOpen())}
           onDownloads={() => quiet(api.openDownloads())}
+          locked={locked() || leaving()}
         />
         <Show when={clipOpen() && !locked()}>
           <Clips watch={settings().clip.watch} onClose={() => setClipOpen(false)} />
@@ -138,7 +141,7 @@ export default function App() {
         </Show>
       </Show>
       <Show when={locked() || leaving()}>
-        <Lock onUnlocked={() => { setLeaving(false); refreshAll(); }} method={settings()?.lock.method ?? "pin"} anim={(settings()?.lock.anim ?? true) && !settings()?.perf.low_memory} />
+        <Lock onUnlocked={() => { setLeaving(false); refreshAll(); }} method={settings()?.lock.method ?? "pin"} lockStyle={settings()?.lock.style ?? "classic"} accounts={settings()?.accounts ?? []} anim={(settings()?.lock.anim ?? true) && !settings()?.perf.low_memory} />
       </Show>
     </div>
   );

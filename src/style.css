@@ -569,6 +569,11 @@ textarea.input { resize: vertical; min-height: 72px; line-height: 1.5; }
 .lkp-btn { width: 220px; pointer-events: none; }
 .still .lkp-ring::before, .still .lkp-ring::after { animation: none; opacity: 0; }
 .lkp.still .lkp-card { animation: none; }
+/* The preview hints at the chosen style (Settings > Lock > Style). */
+.lkp[data-style="ring"] .lkp-ring { box-shadow: 0 0 0 4px var(--bg), 0 0 0 7px var(--matcha-400); }
+.lkp[data-style="glass"] { background: radial-gradient(50% 45% at 25% 25%, var(--accent-glow), transparent), radial-gradient(50% 45% at 80% 80%, var(--mock-a), transparent), var(--bg); }
+.lkp[data-style="glass"] .lkp-card { padding: 22px 24px; border: 1px solid color-mix(in srgb, var(--surface) 70%, transparent); border-radius: 24px; background: color-mix(in srgb, var(--surface) 45%, transparent); backdrop-filter: blur(18px); }
+.lkp[data-style="split"] { justify-items: end; padding-right: 6%; background: linear-gradient(90deg, var(--matcha-600) 0 40%, var(--bg) 40%); }
 
 /* AI test call */
 .run { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -682,6 +687,44 @@ textarea.input { resize: vertical; min-height: 72px; line-height: 1.5; }
 .lock.still .lock-layer, .lock.still .lock-stage { transform: none; }
 .lock.still .blob { will-change: auto; }
 @media (max-height: 640px) { .lock-card { padding: 20px 24px 18px; } .lock-mark { width: 60px; height: 60px; margin-bottom: 10px; } .lock-logo { width: 52px; height: 52px; } .lock-title { margin-bottom: 12px; font-size: 20px; } .lock-date { margin-top: 2px; } }
+
+/* Lock styles (Settings > Lock > Style, .lock[data-style]). "classic" is the rules above as they are. */
+.lock-calm { display: none; }
+/* ring: the mark sits in a ring of segments, one per typed character; it closes and glows on unlock. */
+.lock[data-style="ring"] .lock-mark { width: 92px; height: 92px; margin-bottom: 22px; }
+.lock[data-style="ring"] .lock-logo { width: 60px; height: 60px; }
+.lock[data-style="ring"] .pin-dots span { display: none; }
+.seg-ring { position: absolute; inset: -10px; width: calc(100% + 20px); height: calc(100% + 20px); overflow: visible; transform: rotate(-90deg); transition: opacity 300ms; }
+.seg-ring circle { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: .78 11.22; stroke: color-mix(in srgb, var(--text) 14%, transparent); transition: stroke var(--t-fast) var(--ease), stroke-dasharray var(--t-fast) var(--ease); }
+.seg-ring circle.on { stroke: var(--matcha-400); }
+.lock-mark.wait .seg-ring { opacity: 0; }
+.lock[data-style="ring"] .shake .seg-ring circle { stroke: var(--danger); }
+.lock[data-style="ring"]:not(.opening) .seg-ring { animation: ringPulse 3.2s ease-in-out infinite; }
+@keyframes ringPulse { 50% { transform: rotate(-90deg) scale(1.045); opacity: .8; } }
+.opening .seg-ring circle { stroke-dasharray: 1 11; }
+.opening .seg-ring { animation: ringGlow 320ms var(--ease) both; }
+@keyframes ringGlow { 50% { filter: drop-shadow(0 0 10px var(--matcha-300)); transform: rotate(-90deg) scale(1.06); } }
+
+/* glass: a frosted card over the blobs, with the account names (never message content). */
+.lock[data-style="glass"] { --glass-bg: color-mix(in srgb, var(--surface) 34%, transparent); --glass-edge: color-mix(in srgb, var(--washi-0) 60%, transparent); }
+:root[data-theme="dark"] .lock[data-style="glass"] { --glass-bg: color-mix(in srgb, var(--matcha-900) 66%, transparent); --glass-edge: color-mix(in srgb, var(--matcha-300) 28%, transparent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lock[data-style="glass"] { --glass-bg: color-mix(in srgb, var(--matcha-900) 66%, transparent); --glass-edge: color-mix(in srgb, var(--matcha-300) 28%, transparent); } }
+.lock[data-style="glass"] .lock-card { width: 380px; background: var(--glass-bg); border-color: var(--glass-edge);
+  -webkit-backdrop-filter: blur(36px) saturate(1.7); backdrop-filter: blur(36px) saturate(1.7); box-shadow: var(--shadow), inset 0 1px 0 var(--glass-edge); }
+.lock-accts { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 16px; padding: 0; list-style: none; }
+.lock-accts li { display: flex; align-items: center; gap: 6px; max-width: 160px; padding: 3px 10px 3px 3px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--surface) 45%, transparent); border: 1px solid var(--glass-edge); font-size: var(--fs-sm); font-weight: 550; }
+.lock-accts .svc-ico { width: 22px; height: 22px; flex: none; }
+.lock-accts span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* split: on wide windows a matcha panel holds the clock; the form stands alone on the right. Narrower: classic. */
+@media (min-width: 900px) {
+  .lock[data-style="split"] .lock-stage { position: absolute; inset: 0; grid-template-columns: 40% 1fr; align-items: center; gap: 0; }
+  .lock[data-style="split"] .lock-clock { align-self: stretch; justify-self: stretch; display: grid; align-content: center; justify-items: start; gap: 4px; padding: 0 clamp(32px, 5vw, 72px); text-align: left;
+    color: var(--washi-50); background: radial-gradient(90% 70% at 20% 10%, var(--matcha-500), transparent), linear-gradient(160deg, var(--matcha-600), var(--matcha-800)); }
+  .lock[data-style="split"] .lock-date, .lock[data-style="split"] .lock-ampm { color: color-mix(in srgb, var(--washi-50) 78%, transparent); }
+  .lock[data-style="split"] .lock-calm { display: block; max-width: 30ch; margin: 22px 0 0; font-size: var(--fs-md); line-height: 1.5; color: color-mix(in srgb, var(--washi-50) 82%, transparent); }
+  .lock[data-style="split"] .lock-card { background: none; border-color: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
 
 /* Dialogs */
 .dialog { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; background: var(--bg); }

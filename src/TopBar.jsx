@@ -70,7 +70,7 @@ function WinIcon(p) {
 function Pill(p) {
   return (
     <button type="button" class="cb" classList={{ on: !!p.on }} aria-pressed={p.pressed === undefined ? undefined : p.pressed ? "true" : "false"}
-      aria-label={p.aria ?? p.label} title={p.title ?? p.label} disabled={p.disabled} data-testid={p.testid} onClick={p.onClick}>
+      aria-label={p.aria ?? p.label} title={p.title ?? p.label} disabled={p.disabled || p.locked} data-testid={p.testid} onClick={p.onClick}>
       <Icon name={p.icon} /><span>{p.label}</span>
     </button>
   );
@@ -94,22 +94,22 @@ export default function TopBar(p) {
 
   const remove = (e, id) => {
     e.preventDefault();
-    p.onRemove(id);
+    if (!p.locked) p.onRemove(id);
   };
 
   return (
-    <header class="topbar" data-testid="titlebar">
+    <header class="topbar" classList={{ locked: !!p.locked }} data-testid="titlebar">
       <div class="brand" title="Machat"><Logo /><span class="wordmark">Machat</span></div>
       <div class="topbar-group tiles" role="tablist" aria-label="Accounts">
         <button type="button" class="tile" classList={{ active: p.home && !p.settingsOpen }} role="tab" aria-selected={p.home && !p.settingsOpen ? "true" : "false"}
-          aria-label="Home" title="Home: your accounts, and add new ones" data-testid="tb-home" onClick={p.onHome}>
+          disabled={p.locked} aria-label="Home" title="Home: your accounts, and add new ones" data-testid="tb-home" onClick={p.onHome}>
           <span class="tile-ico is-home"><Icon name="home" /></span><span>Home</span>
         </button>
         <For each={p.accounts}>
           {(a) => (
             <button type="button" class="tile" classList={{ active: onAcct(a.id) }} role="tab"
               aria-selected={onAcct(a.id) ? "true" : "false"}
-              aria-label={acctName(a)} title={`${acctName(a)} (right-click to remove)`} data-testid={`acct-${a.n}`} data-service={a.service}
+              disabled={p.locked} aria-label={acctName(a)} title={`${acctName(a)} (right-click to remove)`} data-testid={`acct-${a.n}`} data-service={a.service}
               onClick={() => p.onSelect(a.id)} onContextMenu={(e) => remove(e, a.id)}
               onKeyDown={(e) => e.key === "Delete" && remove(e, a.id)}>
               <span class="tile-ico"><ServiceIcon service={a.service} /></span>
@@ -121,22 +121,22 @@ export default function TopBar(p) {
       <div class="topbar-space" />
 
       <div class="cg" role="group" aria-label="Censor">
-        <Pill icon="list" label="List" aria="Censor contact list" title="Censor the chat list" on={b().list} pressed={b().list} testid="tb-list" onClick={() => p.onColumn("list", !b().list)} />
-        <Pill icon="chat" label="Chat" aria="Censor open chat" title="Censor the open chat" on={b().chat} pressed={b().chat} testid="tb-chat" onClick={() => p.onColumn("chat", !b().chat)} />
-        <Pill icon="all" label="All" aria="Censor everything" title="Censor everything: list, chat and media (Ctrl+Shift+X)" on={b().enabled} pressed={b().enabled} testid="rail-blur" onClick={p.onBlur} />
+        <Pill locked={p.locked} icon="list" label="List" aria="Censor contact list" title="Censor the chat list" on={b().list} pressed={b().list} testid="tb-list" onClick={() => p.onColumn("list", !b().list)} />
+        <Pill locked={p.locked} icon="chat" label="Chat" aria="Censor open chat" title="Censor the open chat" on={b().chat} pressed={b().chat} testid="tb-chat" onClick={() => p.onColumn("chat", !b().chat)} />
+        <Pill locked={p.locked} icon="all" label="All" aria="Censor everything" title="Censor everything: list, chat and media (Ctrl+Shift+X)" on={b().enabled} pressed={b().enabled} testid="rail-blur" onClick={p.onBlur} />
       </div>
       <div class="cg">
-        <Pill icon="ai" label={p.agentWatch ? "AI · watch" : p.agentOn ? "AI · auto" : "AI"} aria="AI panel"
+        <Pill locked={p.locked} icon="ai" label={p.agentWatch ? "AI · watch" : p.agentOn ? "AI · auto" : "AI"} aria="AI panel"
           title={p.agentWatch ? "Watch all is on: matching chat previews against your rules (never sends)" : p.agentOn ?"Auto-assist is on: drafting suggestions (never sends)" : aiOk() ? "AI assistant" : "AI assistant is WhatsApp-only for now"} on={p.panelOpen || p.agentOn} pressed={p.panelOpen}
           disabled={!aiOk()} testid="rail-ai" onClick={p.onPanel} />
       </div>
       <div class="cg">
-        <Pill icon="clip" label="Clips" aria="Clipboard history" title="Clipboard history: paste a recent copy into the open chat" on={p.clipOpen} pressed={p.clipOpen} testid="tb-clip" onClick={p.onClip} />
-        <Pill icon="folder" label="Files" aria="Open downloads folder" title="Open this account's downloads folder" testid="tb-downloads" onClick={p.onDownloads} />
-        <Pill icon="lock" label="Lock" aria="Lock now" title="Lock now" testid="rail-lock" onClick={p.onLock} />
+        <Pill locked={p.locked} icon="clip" label="Clips" aria="Clipboard history" title="Clipboard history: paste a recent copy into the open chat" on={p.clipOpen} pressed={p.clipOpen} testid="tb-clip" onClick={p.onClip} />
+        <Pill locked={p.locked} icon="folder" label="Files" aria="Open downloads folder" title="Open this account's downloads folder" testid="tb-downloads" onClick={p.onDownloads} />
+        <Pill locked={p.locked} icon="lock" label="Lock" aria="Lock now" title="Lock now" testid="rail-lock" onClick={p.onLock} />
       </div>
       <div class="cg">
-        <Pill icon="gear" label="Settings" on={p.settingsOpen} pressed={p.settingsOpen} testid="rail-settings" onClick={p.onSettings} />
+        <Pill locked={p.locked} icon="gear" label="Settings" on={p.settingsOpen} pressed={p.settingsOpen} testid="rail-settings" onClick={p.onSettings} />
       </div>
 
       <div class="window-controls">

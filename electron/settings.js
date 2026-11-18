@@ -10,6 +10,7 @@ export const BLUR_MODES = ['blur', 'solid', 'scramble'];
 export const TONES = ['neutral', 'friendly', 'formal', 'concise'];
 export const PREF_MAX = 1000;
 export const LOCK_METHODS = ['pin', 'password'];
+export const LOCK_STYLES = ['classic', 'ring', 'glass', 'split'];
 export const IDLE_CHOICES = [0, 1, 5, 15, 30, 60];
 export const MAX_ACCOUNTS = 10;
 export const SUSPEND_CHOICES = [0, 5, 15, 30, 60];
@@ -20,7 +21,7 @@ export const defaults = () => ({
   accounts: [],
   blur: { enabled: true, names: true, avatars: true, previews: true, messages: true, media: true, hover_reveal: true, typing: true, mode: 'blur', color: '#f5c542', list: true, chat: true },
   ai: { provider: 'anthropic', model: MODELS[0], base_url: '', oai_model: '', n: 50, mask: false, audit_content: false, tone: 'neutral', instructions: '', context: '' },
-  lock: { enabled: false, on_start: true, idle_min: 0, method: 'pin', on_minimize: false, anim: true },
+  lock: { enabled: false, on_start: true, idle_min: 0, method: 'pin', on_minimize: false, anim: true, style: 'classic' },
   // Auto-assist (Phase 4b). The on/off toggles are runtime-only in main, never saved.
   agent: { patterns: '', intent_url: '', rag_url: '', rules: [] },
   // Full auto guardrails (ADR-6). Its on/off and live (vs dry-run) switches are runtime-only too: every start is off and dry-run.
@@ -77,7 +78,7 @@ export function validate(s) {
   if (!Number.isInteger(ai.n) || ai.n < 10 || ai.n > 200) throw new Error('invalid n');
   if (!BLUR_MODES.includes(blur.mode) || !validColor(blur.color)) throw new Error('invalid censor mode or colour');
   if (!TONES.includes(ai.tone) || [ai.instructions, ai.context].some((t) => chars(t) > PREF_MAX)) throw new Error('invalid AI preferences');
-  if (!LOCK_METHODS.includes(lock.method) || !IDLE_CHOICES.includes(lock.idle_min)) throw new Error('invalid lock settings');
+  if (!LOCK_METHODS.includes(lock.method) || !IDLE_CHOICES.includes(lock.idle_min) || !LOCK_STYLES.includes(lock.style)) throw new Error('invalid lock settings');
   if (s.download_dir && (!path.isAbsolute(s.download_dir) || ctrl(s.download_dir))) throw new Error('download folder must be an absolute path');
   if (!PROVIDERS.includes(ai.provider)) throw new Error('invalid provider');
   if (!SUSPEND_CHOICES.includes(s.perf.suspend_min)) throw new Error('invalid suspend time');
@@ -102,6 +103,7 @@ function parse(text) {
   try { s = fill(JSON.parse(text)); } catch { return null; }
   if (!s) return null;
   if (!BLUR_MODES.includes(s.blur.mode)) s.blur.mode = 'blur'; // removed modes (pixelate, fade)
+  if (!LOCK_STYLES.includes(s.lock.style)) s.lock.style = 'classic'; // a style from a newer version
   try { validate(s); } catch { return null; }
   return s;
 }
