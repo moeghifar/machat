@@ -26,7 +26,9 @@ export default function Home(p) {
   const n = () => p.accounts.length;
   const [editing, setEditing] = createSignal(null); // account id whose name is being edited
   const [server, setServer] = createSignal(""); // Mattermost server URL being typed
-  const add = (svc) => (svc !== "mattermost" ? p.onAdd(svc) : okServer(server()) && p.onAdd(svc, server().trim()));
+  const [asking, setAsking] = createSignal(false); // Mattermost server dialog
+  const add = (svc) => (svc !== "mattermost" ? p.onAdd(svc) : (setServer(""), setAsking(true)));
+  const addMm = () => { if (!okServer(server())) return; setAsking(false); p.onAdd("mattermost", server().trim()); };
   return (
     <section class="home" aria-label="Home" data-testid="empty-state">
       <div class="home-inner">
@@ -82,13 +84,8 @@ export default function Home(p) {
                 <div class="plat-card">
                   <ServiceIcon service={svc} class="plat-logo" />
                   <div class="plat-text"><b>{SERVICE_NAME[svc]}</b><p>{hint}</p>
-                    <Show when={svc === "mattermost"}>
-                      <input class="input mono" type="url" placeholder="https://chat.example.com" aria-label="Mattermost server URL"
-                        aria-invalid={server() && !okServer(server()) ? "true" : "false"} value={server()}
-                        onInput={(e) => setServer(e.currentTarget.value)} onKeyDown={(e) => e.key === "Enter" && add(svc)} data-testid="mm-url" />
-                    </Show>
                   </div>
-                  <button type="button" class="btn" classList={{ primary: i() === 0 }} disabled={n() >= 10 || (svc === "mattermost" && !okServer(server()))}
+                  <button type="button" class="btn" classList={{ primary: i() === 0 }} disabled={n() >= 10}
                     aria-label={`Add ${SERVICE_NAME[svc]} account`} onClick={() => add(svc)}
                     data-testid={svc === "whatsapp" ? "empty-add" : `empty-add-${svc}`}>
                     <Icon name="plus" />Add
@@ -99,6 +96,22 @@ export default function Home(p) {
           </div>
         </div>
       </div>
+      <Show when={asking()}>
+        <div class="dialog scrim" onClick={(e) => e.target === e.currentTarget && setAsking(false)}>
+          <form class="dialog-box" role="dialog" aria-labelledby="mm-title" data-testid="mm-dialog"
+            onSubmit={(e) => { e.preventDefault(); addMm(); }} onKeyDown={(e) => e.key === "Escape" && setAsking(false)}>
+            <h2 id="mm-title">Add Mattermost</h2>
+            <p>Enter your team's server address. You sign in on the next screen.</p>
+            <input class="input mono" type="url" placeholder="https://chat.example.com" aria-label="Mattermost server URL"
+              aria-invalid={server() && !okServer(server()) ? "true" : "false"} value={server()}
+              ref={(el) => queueMicrotask(() => el.focus())} onInput={(e) => setServer(e.currentTarget.value)} data-testid="mm-url" />
+            <div class="dialog-actions">
+              <button type="button" class="btn" onClick={() => setAsking(false)}>Cancel</button>
+              <button type="submit" class="btn primary" disabled={!okServer(server())} data-testid="mm-add">Add</button>
+            </div>
+          </form>
+        </div>
+      </Show>
     </section>
   );
 }
