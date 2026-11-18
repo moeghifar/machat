@@ -9,8 +9,19 @@ export const TOPBAR = 48; // must equal --topbar-h in src/style.css
 export const PANEL_W = 380;
 export const WA_URL = 'https://web.whatsapp.com/';
 export const TG_URL = 'https://web.telegram.org/k/';
-const URLS = { whatsapp: WA_URL, telegram: TG_URL };
-export const serviceUrl = (service) => (service === 'telegram' ? URLS.telegram : URLS.whatsapp);
+const URLS = { whatsapp: WA_URL, telegram: TG_URL, discord: 'https://discord.com/app', slack: 'https://app.slack.com/client' };
+export const SERVICES = ['whatsapp', 'telegram', 'discord', 'slack', 'mattermost'];
+/** Start page of a service; Mattermost is self-hosted, so its account's own server URL. */
+export const serviceUrl = (service, url) => (service === 'mattermost' ? url : URLS[service] ?? URLS.whatsapp);
+/** Sign-in domains (and their subdomains) an account page may navigate to besides its own origin. */
+export const AUTH_DOMAINS = { discord: ['discord.com', 'discordapp.com'], slack: ['slack.com'] };
+/** Mattermost server URL: https, or http to localhost/a private network; no credentials, query or fragment. */
+export function validServerUrl(raw) {
+  if (typeof raw !== 'string' || raw.length > 2000) return false;
+  const u = parse(raw.trim());
+  if (!u || !u.hostname || u.username || u.password || u.search || u.hash || raw.includes('#') || raw.includes('?')) return false;
+  return u.protocol === 'https:' || (u.protocol === 'http:' && privateHost(u.hostname));
+}
 /** Debug builds only (main decides): MACHAT_WEB_URL / MACHAT_TG_URL point the services at a mock. http(s) with a host, else throws. */
 export function overrideServiceUrls(wa, tg) {
   for (const [k, raw] of [['whatsapp', wa], ['telegram', tg]]) {
@@ -26,10 +37,11 @@ export const validId = (id) => typeof id === 'string' && /^[0-9a-f]{12}$/.test(i
 
 
 /** 'allow' (same origin as the service, or blob/data/about), 'external' (other http(s)), else 'deny'. */
-export function navDecision(url, service) {
+export function navDecision(url, service, domains = []) {
   const u = parse(url);
   if (!u) return 'deny';
   if (['blob:', 'data:', 'about:'].includes(u.protocol)) return 'allow';
+  if (u.protocol === 'https:' && domains.some((d) => u.hostname === d || u.hostname.endsWith('.' + d))) return 'allow';
   if (u.protocol === 'http:' || u.protocol === 'https:') return u.origin === new URL(service).origin ? 'allow' : 'external';
   return u.protocol === 'mailto:' ? 'external' : 'deny';
 }
@@ -134,7 +146,7 @@ export function winAct({ maximized, fullscreen }, wasMax, f11 = false) {
 }
 
 export const NAME_MAX = 40;
-const SERVICE_LABEL = { whatsapp: 'WhatsApp', telegram: 'Telegram' };
+const SERVICE_LABEL = { whatsapp: 'WhatsApp', telegram: 'Telegram', discord: 'Discord', slack: 'Slack', mattermost: 'Mattermost' };
 /** Display name: the user's name for the account, or "WhatsApp 2". */
 export const acctLabel = (a) => (a?.name?.trim() || `${SERVICE_LABEL[a?.service] ?? 'Account'} ${a?.n ?? ''}`.trim());
 /** One safe folder name per account, for its downloads: no separators, reserved characters or dot-only names. */

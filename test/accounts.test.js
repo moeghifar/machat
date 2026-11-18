@@ -12,7 +12,7 @@ test('every command the shell calls is in the main-process command table', () =>
     assert.match(main, new RegExp(`\\b${c}:`), `electron/ipc.js misses ${c}`);
   }
   // add_account takes the service; key commands take the provider
-  assert.match(ipc, /invoke\("add_account", \{ service \}\)/);
+  assert.match(ipc, /invoke\("add_account", \{ service, url \}\)/);
   for (const c of ['has_api_key', 'set_api_key', 'clear_api_key']) assert.match(ipc, new RegExp(`invoke\\("${c}", \\{ provider`), c);
 });
 

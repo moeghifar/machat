@@ -64,7 +64,7 @@ export default function App() {
   async function lockNow() {
     try { await api.lockNow(); } catch { setPinAsk((n) => n + 1); setSettingsOpen(true); } // no PIN yet: Settings > Lock, cursor in the PIN field
   }
-  const addAccount = (service) => { setSettingsOpen(false); setHome(false); quiet(api.addAccount(service)); };
+  const addAccount = (service, url) => { setSettingsOpen(false); setHome(false); quiet(api.addAccount(service, url)); };
   const openAccount = (id) => { setSettingsOpen(false); setFilesOpen(false); setHome(false); quiet(api.activateAccount(id)); };
   const askRemove = (id) => !locked() && setRemoving(accts().accounts.find((a) => a.id === id) ?? null);
 

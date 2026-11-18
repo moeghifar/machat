@@ -3,7 +3,7 @@ import { WebContentsView, Menu, session, shell, dialog, desktopCapturer, clipboa
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { validId, navDecision, serviceUrl, downloadTarget, permitted, accountUA, viewRect, MEDIA_WORDS, safeExternal, idleIds, acctFolder, acctLabel, NAME_MAX } from './util.js';
+import { validId, navDecision, serviceUrl, validServerUrl, AUTH_DOMAINS, SERVICES, downloadTarget, permitted, accountUA, viewRect, MEDIA_WORDS, safeExternal, idleIds, acctFolder, acctLabel, NAME_MAX } from './util.js';
 import { MAX_ACCOUNTS, validate } from './settings.js';
 
 const read = (root, files) => files.map((f) => fs.readFileSync(path.join(root, 'inject', f + '.js'), 'utf8')).join('\n');
@@ -15,6 +15,10 @@ export function makeAccounts(ctx) {
     whatsapp: read(ctx.root, ['selectors', 'blur', 'notify', 'reader', 'draft', 'aibutton', 'boot']),
     telegram: read(ctx.root, ['selectors-tg', 'blur', 'notify', 'boot']),
   };
+  // Discord, Slack, Mattermost: no selectors, so no censor, reader or AI button; notify.js still redacts nothing (censoring off).
+  // ponytail: censor is off on these services; add selectors-<svc>.js + blur + boot when someone needs it.
+  INIT.discord = INIT.slack = INIT.mattermost = '(function(){const MC=(globalThis.__machatLib||={});MC.censoring=()=>false;'
+    + 'window.__machat={apply(s){MC.state={...MC.state,...s};}};})();\n' + read(ctx.root, ['notify']);
   const UA = accountUA(process.versions.chrome);
   const views = new Map(); // id -> WebContentsView
   const partitionDir = (id) => path.join(ctx.userData, 'Partitions', 'acct-' + id);
@@ -129,14 +133,15 @@ export function makeAccounts(ctx) {
   function ensureView(id) {
     if (views.has(id)) return views.get(id);
     const a = find(id);
-    const url = serviceUrl(a.service);
+    const url = serviceUrl(a.service, a.url);
+    const auth = AUTH_DOMAINS[a.service];
     const ses = session.fromPartition((a.temp ? '' : 'persist:') + 'acct-' + id); // temp (selfcheck): in-memory, nothing on disk
     setupSession(ses, url, id);
     const v = new WebContentsView({ webPreferences: { session: ses, preload: path.join(ctx.root, 'electron', 'preload-account.cjs'), sandbox: true, contextIsolation: true, devTools: !!ctx.devTools } });
     const wc = v.webContents;
     v.setVisible(false);
     const guard = (e, u) => {
-      const d = navDecision(u, url);
+      const d = navDecision(u, url, auth);
       if (d === 'allow') return;
       e.preventDefault();
       if (d === 'external' && safeExternal(u)) shell.openExternal(u);
@@ -144,7 +149,10 @@ export function makeAccounts(ctx) {
     wc.on('will-navigate', guard);
     wc.on('will-redirect', guard);
     wc.setWindowOpenHandler(({ url: u }) => {
-      if (navDecision(u, url) === 'external' && safeExternal(u)) shell.openExternal(u);
+      const d = navDecision(u, url, auth);
+      // Sign-in popups (Slack/Discord SSO) on the service's own domains: a child window in the same session.
+      if (auth && d === 'allow' && u.startsWith('https:')) return { action: 'allow' };
+      if (d === 'external' && safeExternal(u)) shell.openExternal(u);
       // A document or media the page opens as its own blob (e.g. "Open" on a PDF): save it instead of a new window.
       else if (u.startsWith('blob:' + new URL(url).origin + '/')) wc.downloadURL(u);
       return { action: 'deny' };
@@ -238,13 +246,14 @@ export function makeAccounts(ctx) {
     return a;
   }
 
-  function add(service) {
-    if (service !== 'whatsapp' && service !== 'telegram') throw new Error('invalid service');
+  function add(service, url) {
+    if (!SERVICES.includes(service)) throw new Error('invalid service');
+    if (service === 'mattermost' && !validServerUrl(url)) throw new Error('server URL must be https (http only for localhost or a private network)');
     const s = structuredClone(ctx.settings());
     if (s.accounts.length >= MAX_ACCOUNTS) throw new Error('too many accounts');
     let id;
     do id = randomBytes(6).toString('hex'); while (s.accounts.some((a) => a.id === id) || s.removed.includes(id));
-    const acct = { id, n: Math.max(0, ...s.accounts.map((a) => a.n)) + 1, service };
+    const acct = { id, n: Math.max(0, ...s.accounts.map((a) => a.n)) + 1, service, ...(service === 'mattermost' ? { url: new URL(url.trim()).href } : {}) };
     s.accounts.push(acct);
     validate(s);
     ctx.commit(s);
