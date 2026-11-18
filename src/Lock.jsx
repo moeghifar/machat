@@ -95,7 +95,7 @@ export default function Lock(props) {
       </div>
       <div class="lock-stage">
         <div class="lock-clock" aria-hidden="true"><div class="lock-time">{time()}<Show when={period()}><span class="lock-ampm">{period()}</span></Show></div><div class="lock-date">{date()}</div><p class="lock-calm">Your chats are resting. Unlock when you are ready.</p></div>
-        <form class="lock-card" classList={{ shake: shake() }} onSubmit={submit}>
+        <form class="lock-card" classList={{ shake: shake() }} onSubmit={submit} onPointerDown={(e) => { if (e.target !== input && e.target.tagName !== "BUTTON") { e.preventDefault(); input.focus(); } }}>
           <div class="lock-mark" classList={{ wait: !!wait() }} aria-hidden="true">
             <svg class="lock-ring" viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="46" /><circle class="left" cx="50" cy="50" r="46" pathLength="1" style={{ "stroke-dashoffset": 1 - wait() / BACKOFF_S }} /></svg>
             <svg class="lock-logo" viewBox="0 0 512 512">
@@ -133,7 +133,9 @@ export default function Lock(props) {
               value={pin()} onInput={(e) => { setErr(""); setBad(0); setPin(pw() ? e.currentTarget.value.slice(0, 128) : e.currentTarget.value.replace(/\D/g, "").slice(0, 12)); e.currentTarget.value = pin(); }} />
           </div>
           <p class="lock-msg" classList={{ bad: !!err() }} role="alert" data-testid="lock-msg">
-            <Show when={wait()} fallback={err() || (pw() ? "Enter your password" : "Enter your PIN")}>
+            <Show when={wait()} fallback={err() || (st() === "ring"
+              ? (pin().length >= min() ? "Press Enter to unlock" : pw() ? "Type your password" : "Type your PIN")
+              : pw() ? "Enter your password" : "Enter your PIN")}>
               {err()}. Try again in {wait()}s.
             </Show>
           </p>
