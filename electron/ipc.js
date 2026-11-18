@@ -1,5 +1,5 @@
 // Shell command table (same snake_case names as src-tauri/src/commands.rs) and the ipc handlers.
-import { ipcMain, dialog, utilityProcess, Notification, shell } from 'electron';
+import { ipcMain, dialog, utilityProcess, Notification, shell, nativeTheme } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,7 +15,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 const SHELL = 'app://shell/';
 // Usable while locked; everything else is default-deny behind the lock.
-const OPEN = new Set(['get_settings', 'lock_status', 'unlock', 'lock_now', 'window_state', 'window_max_action', 'win_minimize', 'win_close']);
+const OPEN = new Set(['set_theme', 'get_settings', 'lock_status', 'unlock', 'lock_now', 'window_state', 'window_max_action', 'win_minimize', 'win_close']);
 const ASK_AI = 'globalThis.__machatLib&&__machatLib.onAskAi&&__machatLib.onAskAi()';
 
 // m: { win(), state, sec, unlock(pin), lockNow(), settings(), commit(s), accts, toggleBlur(), winState(), winAction(f11), userData, sendShell(name, v), anthropicBase }
@@ -319,6 +319,8 @@ export function registerIpc(m) {
       return rules.map((_, i) => ({ match: r.hits.find((h) => h.rule === i)?.match ?? null, timeout: r.timeouts.includes(i) }));
     },
     rename_account: ({ id, name }) => m.accts.rename(id, name),
+    // App-wide: drives prefers-color-scheme in the shell and in every account page.
+    set_theme: ({ theme }) => { nativeTheme.themeSource = ['light', 'dark'].includes(theme) ? theme : 'system'; },
     // The active account's download folder (created if missing), else the base folder.
     open_downloads: async () => {
       const dir = m.accts.downloadDir(m.state.active);

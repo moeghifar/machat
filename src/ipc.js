@@ -50,6 +50,7 @@ export const api = {
   removeAccount: (id) => invoke("remove_account", { id }),
   renameAccount: (id, name) => invoke("rename_account", { id, name }),
   openDownloads: () => invoke("open_downloads"),
+  setTheme: (theme) => invoke("set_theme", { theme }),
   windowState: () => invoke("window_state"),
   windowMaxAction: () => invoke("window_max_action"),
   clipList: () => invoke("clip_list"),
