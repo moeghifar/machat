@@ -142,3 +142,23 @@ export function acctFolder(a) {
   const f = acctLabel(a).replace(/[\u0000-\u001f\u007f-\u009f<>:"/\\|?*]/g, '_').replace(/[. ]+$/, '').replace(/^\.+/, '').trim();
   return f || `account-${a?.n ?? 0}`;
 }
+
+/**
+ * Data folder: <appData>/machat. Moves the old <appData>/dev.moeghifar.machat-web there once (same disk, one rename),
+ * unless the old folder is in use by a running copy (its SingletonLock exists), in which case the old folder is used
+ * this time and the move happens on a later start. A stray, settings-less <appData>/machat is set aside, not deleted.
+ */
+export function migrateUserData(appData, f = fs, now = Date.now) {
+  const NEW = path.join(appData, 'machat'), OLD = path.join(appData, 'dev.moeghifar.machat-web');
+  const has = (p) => { try { f.lstatSync(p); return true; } catch { return false; } };
+  if (has(path.join(NEW, 'settings.json')) || !has(OLD)) return NEW;
+  if (['SingletonLock', 'lockfile'].some((l) => has(path.join(OLD, l)))) return OLD; // Linux/macOS, Windows
+  try {
+    if (has(NEW)) f.renameSync(NEW, `${NEW}.old-${now()}`);
+    f.renameSync(OLD, NEW);
+    return NEW;
+  } catch (e) {
+    console.error('machat: could not move the data folder: ' + e.message);
+    return OLD;
+  }
+}

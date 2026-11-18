@@ -19,7 +19,7 @@ const DEVTOOLS = !app.isPackaged;
 app.on('web-contents-created', (_e, wc) => wc.on('will-attach-webview', (ev) => ev.preventDefault()));
 import { makeAccounts } from './accounts.js';
 import { registerIpc } from './ipc.js';
-import { winAct, fitBounds, overrideServiceUrls } from './util.js';
+import { winAct, fitBounds, overrideServiceUrls, migrateUserData } from './util.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
@@ -29,7 +29,7 @@ const SHELL = 'app://shell/';
 app.setName('machat');
 app.setDesktopName('machat.desktop');
 app.commandLine.appendSwitch('class', 'machat');
-app.setPath('userData', path.join(app.getPath('appData'), 'dev.moeghifar.machat-web'));
+app.setPath('userData', migrateUserData(app.getPath('appData')));
 if (!app.requestSingleInstanceLock()) app.exit(0);
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
 // The page must not take over the OS media keys / media session.

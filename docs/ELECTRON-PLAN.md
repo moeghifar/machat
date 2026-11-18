@@ -8,7 +8,7 @@ See conversation summary; key points for implementers:
 - IPC: ipcMain.handle('mc',(e,cmd,args)) -> {v}|{err:string}; sender must be shell main frame at app://shell; lock gate default-deny with allowlist (get_settings, lock_status, unlock, lock_now, window_state, window_max_action, win_minimize, win_close). Same snake_case command names as src-tauri/src/commands.rs. Events main->shell via webContents.send('mc:<name>'): settings, lock, ai:context, accounts, window-state, ai:chunk. src/ipc.js: invoke=window.machat.invoke + unwrap; small Ch class over on('ai:chunk').
 - Page->main mc:page {cmd,args}: ai_context (WA only), toggle_blur. Focus from BrowserWindow focus/blur, not page.
 - boot.js: drop Tauri branch and page focus reporter. App.jsx: delete acct-elsewhere dialog. Drag: -webkit-app-region. index.html CSP connect-src 'none'.
-- userData = <appData>/dev.moeghifar.machat-web so settings.json loads unchanged.
+- userData = <appData>/machat (moved once from <appData>/dev.moeghifar.machat-web by util.migrateUserData).
 - Secrets: safeStorage, userData/secrets.json 0600, refuse basic_text backend on Linux; PIN scrypt+salt+timingSafeEqual; PIN 4-12 digits, password 8-128, 5 fails -> 30s backoff.
 - Every view hide must focus the shell (keystrokes must not reach composer behind lock).
 - Permissions: notifications + mic + camera for exact service origin only.

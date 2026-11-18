@@ -1,4 +1,4 @@
-# machat-web: PLAN
+# Machat: PLAN
 
 A Tauri v2 desktop shell around https://web.whatsapp.com with privacy blur, notification redaction, an optional app lock and an AI assistant. It is for the owner's internal use only. Its chrome uses the "Ember" tokens of the sibling app `../machat` (THEMES.md §2A, `frontend/public/style.css`). No WhatsApp logo, green or trade dress appears in our chrome.
 
