@@ -247,7 +247,7 @@ export function registerIpc(m) {
     unlock: ({ pin }) => m.unlock(pin),
     lock_now: () => m.lockNow(),
     list_accounts: () => m.accts.snapshot(),
-    add_account: ({ service }) => { cancelSend('the account changed'); clearCtx(); return m.accts.add(service); },
+    add_account: ({ service, url }) => { cancelSend('the account changed'); clearCtx(); return m.accts.add(service, url); },
     activate_account: ({ id }) => { if (id !== m.state.active) { cancelSend('the account changed'); ag.sugg.clear(); clearCtx(); setAgent(false, false, false); } return m.accts.activate(id); },
     remove_account: ({ id }) => { cancelSend('the account changed'); if (ai.acct === id) clearCtx(); return m.accts.remove(id); },
     toggle_blur: () => m.toggleBlur(),

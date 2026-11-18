@@ -2,7 +2,7 @@ import { createSignal, onMount, onCleanup, For } from "solid-js";
 import { api, on, win } from "./ipc.js";
 import { maxButton } from "./winstate.js";
 
-export const SERVICE_NAME = { whatsapp: "WhatsApp", telegram: "Telegram" };
+export const SERVICE_NAME = { whatsapp: "WhatsApp", telegram: "Telegram", discord: "Discord", slack: "Slack", mattermost: "Mattermost" };
 export const acctName = (a) => a.name?.trim() || `${SERVICE_NAME[a.service] ?? "Account"} ${a.n}`;
 
 // Machat mark (src-tauri/icons/logo.svg), "Twin shackle m": two lock shackles read as an m, over a
@@ -19,7 +19,27 @@ export const Logo = (p) => (
 // The services' own favicon marks, drawn as SVG so they stay sharp at any size.
 export const ServiceIcon = (p) => (
   <svg class={p.class ?? "svc-ico"} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-    {p.service === "telegram" ? (
+    {p.service === "discord" ? (
+      <>
+        <circle cx="16" cy="16" r="16" fill="#5865F2" />
+        <path d="M10 10.5c2-1 4-1.3 6-1.3s4 .3 6 1.3c1.5 2.4 2.3 5.2 2.2 9.6-1.4 1.1-3 1.8-4.6 2.2l-1-1.7c-1.7.4-3.5.4-5.2 0l-1 1.7c-1.6-.4-3.2-1.1-4.6-2.2-.1-4.4.7-7.2 2.2-9.6Z" fill="#fff" />
+        <circle cx="13" cy="16.5" r="1.6" fill="#5865F2" /><circle cx="19" cy="16.5" r="1.6" fill="#5865F2" />
+      </>
+    ) : p.service === "slack" ? (
+      <>
+        <rect width="32" height="32" rx="8" fill="#4A154B" />
+        <path d="M13 7v11" stroke="#36C5F0" stroke-width="3.4" stroke-linecap="round" />
+        <path d="M14 13h11" stroke="#2EB67D" stroke-width="3.4" stroke-linecap="round" />
+        <path d="M19 14v11" stroke="#ECB22E" stroke-width="3.4" stroke-linecap="round" />
+        <path d="M7 19h11" stroke="#E01E5A" stroke-width="3.4" stroke-linecap="round" />
+      </>
+    ) : p.service === "mattermost" ? (
+      <>
+        <circle cx="16" cy="16" r="16" fill="#1E325C" />
+        <circle cx="16" cy="16" r="8.5" fill="none" stroke="#fff" stroke-width="2.4" />
+        <path d="M17.5 9.5l-.5 7.3a1.4 1.4 0 0 1-2.8-.2l1.2-6.6Z" fill="#fff" />
+      </>
+    ) : p.service === "telegram" ? (
       <>
         <circle cx="16" cy="16" r="16" fill="#2AABEE" />
         <path d="M7.4 15.6l15.3-5.9c.7-.3 1.3.2 1.1 1.2l-2.6 12.2c-.2.9-.7 1.1-1.4.7l-3.9-2.9-1.9 1.8c-.2.2-.4.4-.8.4l.3-4 7.2-6.5c.3-.3-.1-.4-.5-.2l-8.9 5.6-3.8-1.2c-.8-.3-.8-.8.2-1.2Z" fill="#fff" />

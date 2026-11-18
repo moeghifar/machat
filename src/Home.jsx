@@ -4,7 +4,18 @@ import { acctName, SERVICE_NAME, ServiceIcon, Icon } from "./TopBar.jsx";
 const PLATFORMS = [
   ["whatsapp", "Scan the QR code with your phone to link it."],
   ["telegram", "Sign in with your phone number or a QR code."],
+  ["discord", "Sign in with your Discord email or a QR code."],
+  ["slack", "Sign in to your Slack workspace."],
+  ["mattermost", "Enter your team's server address, then sign in."],
 ];
+// Same rule as validServerUrl in electron/util.js (main checks again): https, or http to localhost or a private network.
+const okServer = (raw) => {
+  try {
+    const u = new URL(raw.trim());
+    return !u.username && !u.password && !u.search && !u.hash && (u.protocol === "https:"
+      || (u.protocol === "http:" && /^(localhost|.*\.localhost|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|\[::1\])$/.test(u.hostname)));
+  } catch { return false; }
+};
 
 const censorSummary = (b) =>
   b.list && b.chat ? "Censor is on for everything" : b.list ? "Censor is on for the chat list" : b.chat ? "Censor is on for the open chat" : "Censor is off";
@@ -14,6 +25,8 @@ export default function Home(p) {
   const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
   const n = () => p.accounts.length;
   const [editing, setEditing] = createSignal(null); // account id whose name is being edited
+  const [server, setServer] = createSignal(""); // Mattermost server URL being typed
+  const add = (svc) => (svc !== "mattermost" ? p.onAdd(svc) : okServer(server()) && p.onAdd(svc, server().trim()));
   return (
     <section class="home" aria-label="Home" data-testid="empty-state">
       <div class="home-inner">
@@ -68,10 +81,16 @@ export default function Home(p) {
               {([svc, hint], i) => (
                 <div class="plat-card">
                   <ServiceIcon service={svc} class="plat-logo" />
-                  <div class="plat-text"><b>{SERVICE_NAME[svc]}</b><p>{hint}</p></div>
-                  <button type="button" class="btn" classList={{ primary: i() === 0 }} disabled={n() >= 10}
-                    aria-label={`Add ${SERVICE_NAME[svc]} account`} onClick={() => p.onAdd(svc)}
-                    data-testid={svc === "whatsapp" ? "empty-add" : "empty-add-telegram"}>
+                  <div class="plat-text"><b>{SERVICE_NAME[svc]}</b><p>{hint}</p>
+                    <Show when={svc === "mattermost"}>
+                      <input class="input mono" type="url" placeholder="https://chat.example.com" aria-label="Mattermost server URL"
+                        aria-invalid={server() && !okServer(server()) ? "true" : "false"} value={server()}
+                        onInput={(e) => setServer(e.currentTarget.value)} onKeyDown={(e) => e.key === "Enter" && add(svc)} data-testid="mm-url" />
+                    </Show>
+                  </div>
+                  <button type="button" class="btn" classList={{ primary: i() === 0 }} disabled={n() >= 10 || (svc === "mattermost" && !okServer(server()))}
+                    aria-label={`Add ${SERVICE_NAME[svc]} account`} onClick={() => add(svc)}
+                    data-testid={svc === "whatsapp" ? "empty-add" : `empty-add-${svc}`}>
                     <Icon name="plus" />Add
                   </button>
                 </div>
