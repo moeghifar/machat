@@ -6,7 +6,7 @@ import { validateRules } from './agent-core.js';
 import { validateAuto } from './autoreply.js';
 
 export const MODELS = ['claude-haiku-5-5', 'claude-sonnet-5-5'];
-export const BLUR_MODES = ['blur', 'solid', 'scramble'];
+export const BLUR_MODES = ['blur', 'solid', 'scramble', 'glyph', 'bars', 'halftone', 'pixel']; // = MC.MODES in inject/blur.js
 export const TONES = ['neutral', 'friendly', 'formal', 'concise'];
 export const PREF_MAX = 1000;
 export const LOCK_METHODS = ['pin', 'password'];

@@ -81,7 +81,7 @@ test('blur mode: text uses fill+shadow with no filter, pictures keep the filter,
     assert.doesNotMatch(sel, /data-pre-plain-text\](,|\s*$|\s*\{)/, 'bubble block targeted: ' + sel);
     assert.doesNotMatch(sel, /\.message-(in|out)|\[role="row"\]\s*(,|$)/, sel);
   }
-  assert.match(css, /html\.mc-chat #main span\.selectable-text[^{]*\{ -webkit-text-fill-color: transparent !important; text-shadow: 0 0 14px currentColor !important; \}/);
+  assert.match(css, /html\.mc-chat #main span\.selectable-text[^{]*\{ -webkit-text-fill-color: transparent !important; text-shadow: 0 0 14px currentColor !important; user-select: none !important; \}/);
   assert.match(css, /html\.mc-chat #main span\.selectable-text img[^{]*\{ filter: blur\(6px\)/, 'inline emoji is filtered');
   assert.match(css, /html\.mc-list #pane-side img[^{]*\{ filter: blur\(6px\)/, 'avatars keep the filter');
   assert.doesNotMatch(css, /blur\(0px\)/, 'the no-op layer-forcing rule is gone');
@@ -156,6 +156,11 @@ test('every mode covers and reveals with matching properties', () => {
   const cases = {
     blur: [/-webkit-text-fill-color: transparent !important; text-shadow: 0 0 14px currentColor !important/, /-webkit-text-fill-color: currentcolor !important; text-shadow: none !important/],
     solid: [/background-color: #12ab34 !important; -webkit-text-fill-color: transparent/, /background-color: transparent !important; -webkit-text-fill-color: currentcolor/],
+    glyph: [/-webkit-text-security: square !important; user-select: none/, /:hover[^{]*\{ -webkit-text-security: none !important; user-select: auto/],
+    bars: [/background-color: currentColor !important;[^}]*box-decoration-break: clone; user-select: none/, /:hover[^{]*\{ background-color: transparent !important; -webkit-text-fill-color: currentcolor !important; user-select: auto/],
+    halftone: [/-webkit-mask: radial-gradient\(circle, #000 35%, transparent 40%\) 0 0\/4px 4px !important; filter: blur\(2px\)/, /:hover[^{]*\{ -webkit-mask: none !important; filter: none/],
+    pixel: [/#main video[^{]*\{ filter: url\(#mc-pixel\) !important; \}/, /:hover[^{]*video[^{]*\{ filter: none/],
+    scramble: [/\{  user-select: none !important; \}/, /\{  user-select: auto !important; \}/],
   };
   for (const [mode, [cover, reveal]] of Object.entries(cases)) {
     const css = MC.blurCss({ ...all, mode, color: '#12ab34' });

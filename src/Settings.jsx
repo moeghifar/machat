@@ -9,6 +9,10 @@ export const MODES = [
   ["blur", "Blur"],
   ["solid", "Solid colour block"],
   ["scramble", "Scramble (random characters)"],
+  ["glyph", "Block glyphs"],
+  ["bars", "Redaction bars"],
+  ["halftone", "Halftone dots"],
+  ["pixel", "Pixel mosaic (pictures), bars (text)"],
 ];
 const PROVIDERS = [["anthropic", "Anthropic"], ["openai", "OpenAI-compatible"]];
 const TONES = [["neutral", "Neutral"], ["friendly", "Friendly"], ["formal", "Formal"], ["concise", "Concise"]];
@@ -75,6 +79,7 @@ function CensorPreview(p) {
   const rows = [["Rina Putri", "can we move the review?"], ["Team Ops", "deploy passed"], ["Budi", "ok, updating the invite"], ["Mom", "call me tonight"]];
   return (
     <div class="pv" style={{ "--block": b().color }}>
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true"><filter id="pv-pixel" x="0" y="0"><feFlood x="3" y="3" width="1" height="1" /><feComposite width="6" height="6" /><feTile result="t" /><feComposite in="SourceGraphic" in2="t" operator="in" /><feMorphology operator="dilate" radius="3" /></filter></svg>
       <div class="pv-head"><b>Preview</b><span class="live"><i />live</span></div>
       <div class="mini" classList={{ reveal: b().hover_reveal && b().list }}>
         <Show when={b().hover_reveal && b().list}><span class="cursor" aria-hidden="true" /></Show>
@@ -401,7 +406,7 @@ export default function Settings(p) {
                   <For each={MODES}>{([id, l]) => <option value={id}>{l}</option>}</For>
                 </select>
               </Row>
-              <Show when={s().blur.mode === "solid"}>
+              <Show when={["solid", "bars", "pixel"].includes(s().blur.mode)}>
                 <Row label="Block colour" hint="Like a highlighter pen.">
                   <input class="swatch" type="color" aria-label="Block colour" value={s().blur.color} data-testid="censor-color"
                     onChange={(e) => patch((d) => { d.blur.color = e.currentTarget.value; })} />

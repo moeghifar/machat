@@ -20,6 +20,7 @@ app.on('web-contents-created', (_e, wc) => wc.on('will-attach-webview', (ev) => 
 import { makeAccounts } from './accounts.js';
 import { registerIpc } from './ipc.js';
 import { winAct, fitBounds, overrideServiceUrls, migrateUserData } from './util.js';
+import { censorOk } from './caps.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
@@ -78,6 +79,8 @@ function commit(next) {
 }
 
 function toggleBlur() {
+  const svc = settings.accounts.find((a) => a.id === state.active)?.service;
+  if (!censorOk(svc)) return settings.blur.list && settings.blur.chat; // no censor on its page: nothing to toggle
   const on = !(settings.blur.list && settings.blur.chat); // both on -> both off; otherwise both on
   commit({ ...settings, blur: { ...settings.blur, list: on, chat: on } });
   return on;

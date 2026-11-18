@@ -1,7 +1,8 @@
 import { createSignal, createEffect, createMemo, onMount, onCleanup, on as onChange, For, Show } from "solid-js";
 import { api, ask, on, IDLE } from "./ipc.js";
 import { Switch, MODEL_LABEL } from "./Settings.jsx";
-import { Icon } from "./TopBar.jsx";
+import { Icon, SERVICE_NAME } from "./TopBar.jsx";
+import { aiOk } from "../electron/caps.js";
 
 const PRESETS = [
   ["summarize", "Summarize"],
@@ -47,7 +48,8 @@ export default function AIPanel(p) {
   // The OpenAI-compatible key is optional (local servers); Anthropic needs one.
   const keyOk = () => oai() || p.hasKey();
   const noEndpoint = () => oai() && (!endpoint() || !p.settings().ai.oai_model.trim());
-  const ready = () => keyOk() && p.ctx() && !busy() && !noEndpoint();
+  const svcOff = () => (aiOk(p.service) ? "" : `AI assist isn't available for ${SERVICE_NAME[p.service] ?? p.service}`);
+  const ready = () => !svcOff() && keyOk() && p.ctx() && !busy() && !noEndpoint();
   // Where chat text goes, shown in the panel because the user chose it.
   const endpoint = () => {
     const a = p.settings().ai;
@@ -122,6 +124,7 @@ export default function AIPanel(p) {
   // Why a mode cannot be turned on: [reason, button label, Settings target], or null. A mode that is on can always be turned off.
   const why = (k) => {
     if (ag()[k]) return null;
+    if (svcOff()) return [svcOff() + "."];
     if (k === "watch") return p.settings().agent.rules.length ? null : ["No rules yet.", "Add rules", "rules"];
     if (!keyOk()) return ["Needs an API key.", "Add API key", "key"];
     return noEndpoint() ? ["Needs an endpoint and model.", "Open Settings", "ai"] : null;
@@ -194,6 +197,7 @@ export default function AIPanel(p) {
 
       {/* ---- Ask: you ask, about the chat that is open ---- */}
       <div class="ai-pane" id="ai-pane-ask" role="tabpanel" aria-labelledby="ai-tab-ask" hidden={tab() !== "ask"} ref={askPane} data-testid="ai-pane-ask">
+        <Show when={svcOff()}><p class="notice" data-testid="ai-nosvc">{svcOff()}. Switch to a WhatsApp account to use it.</p></Show>
         <Show when={!keyOk()}>
           <div class="notice" data-testid="ai-nokey">
             <p>Add your Anthropic API key to use the assistant.</p>
@@ -354,7 +358,7 @@ export default function AIPanel(p) {
                   <Show when={why(k)}>
                     <div class="ag-why" data-testid={`agent-why-${k}`}>
                       <span>{why(k)[0]}</span>
-                      <button type="button" class="btn sm" onClick={() => p.onOpenSettings(why(k)[2])}>{why(k)[1]}</button>
+                      <Show when={why(k)[1]}><button type="button" class="btn sm" onClick={() => p.onOpenSettings(why(k)[2])}>{why(k)[1]}</button></Show>
                     </div>
                   </Show>
                 </div>

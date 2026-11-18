@@ -151,3 +151,20 @@ test('a settings file with the lock enabled but no PIN in this store loads with 
   assert.equal(n.lock.on_start, s.lock.on_start);
   assert.equal(lockNeedsPin(n, false), n);
 });
+
+test('every censor style validates, and matches the modes blur.js knows', async () => {
+  for (const mode of ['blur', 'solid', 'scramble', 'glyph', 'bars', 'halftone', 'pixel']) { const s = defaults(); s.blur.mode = mode; ok(s); }
+  const s = defaults(); s.blur.mode = 'pixelate'; bad(s, 'unknown mode');
+  const { BLUR_MODES } = await import('../electron/settings.js');
+  const src = fs.readFileSync(new URL('../inject/blur.js', import.meta.url), 'utf8');
+  assert.equal(src.match(/MC\.MODES = (\[[^\]]*\])/)[1].replace(/'/g, '"'), JSON.stringify(BLUR_MODES).replace(/,/g, ', '));
+});
+
+test('censor and AI are off for services without selectors; main and the shell both use caps.js', async () => {
+  const { censorOk, aiOk } = await import('../electron/caps.js');
+  assert.deepEqual(['whatsapp', 'telegram', 'discord', 'slack', 'mattermost', undefined].map(censorOk), [true, true, false, false, false, true]);
+  assert.deepEqual(['whatsapp', 'telegram', 'discord'].map(aiOk), [true, false, false]);
+  const read = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+  assert.match(read('electron/main.js'), /function toggleBlur\(\) \{\n[^\n]*\n\s*if \(!censorOk\(svc\)\) return/);
+  assert.match(read('src/App.jsx'), /if \(!censorOk\(activeSvc\(\)\)\) return/);
+});

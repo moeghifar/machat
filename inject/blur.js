@@ -20,18 +20,36 @@ MC.censoring = (s) => COLS.some((c) => MC.colOn(s, c));
 // Text is never filtered in blur mode: the glyphs are made transparent and replaced by their own
 // shadow, so bubbles, backgrounds and layout are untouched. Pictures and icons get a real filter.
 function look(mode, visual, color) {
+  const lk = look1(mode, visual, color);
+  // Covered text can't be selected (and copied out) until revealed.
+  return visual ? lk : [lk[0] + ' user-select: none !important;', lk[1] + ' user-select: auto !important;'];
+}
+const SOLID_PIC = (color) => ['filter: url(#mc-solid) !important; object-position: -99999px 0 !important; background-color: ' + color + ' !important;',
+  'filter: none !important; object-position: 50% 50% !important; background-color: transparent !important;'];
+// iOS-style redaction: one rounded pill per text line, in the text's own colour.
+const BARS = ['background-color: currentColor !important; -webkit-text-fill-color: transparent !important; border-radius: 999px; -webkit-box-decoration-break: clone; box-decoration-break: clone;',
+  'background-color: transparent !important; -webkit-text-fill-color: currentcolor !important;'];
+function look1(mode, visual, color) {
   switch (mode) {
-    case 'scramble': // text is rewritten by MC.scramble, not styled; pictures fall through to blur
-      if (!visual) return null;
+    case 'scramble': // text is rewritten by MC.scramble; its rule only stops selection. Pictures fall through to blur
+      if (!visual) return ['', ''];
       break;
     case 'solid':
       // Pictures: object-position pushes the pixels out of the box so only the colour fills it. Works even where
       // WebKit ignores url() filters on <img> (that leaked avatars); the filter still covers canvases and icons.
-      return visual
-        ? ['filter: url(#mc-solid) !important; object-position: -99999px 0 !important; background-color: ' + color + ' !important;',
-           'filter: none !important; object-position: 50% 50% !important; background-color: transparent !important;']
+      return visual ? SOLID_PIC(color)
         : ['background-color: ' + color + ' !important; -webkit-text-fill-color: transparent !important; border-radius: 3px;',
            'background-color: transparent !important; -webkit-text-fill-color: currentcolor !important;'];
+    case 'glyph': // Chromium draws every glyph as a block (inherited, so children too); pictures blur
+      if (!visual) return ['-webkit-text-security: square !important;', '-webkit-text-security: none !important;'];
+      break;
+    case 'bars':
+      return visual ? SOLID_PIC(color) : BARS;
+    case 'halftone': // dot screen over the whole target element (text block, bubble, picture), softened
+      return ['-webkit-mask: radial-gradient(circle, #000 35%, transparent 40%) 0 0/4px 4px !important; filter: blur(2px) !important;',
+        '-webkit-mask: none !important; filter: none !important;'];
+    case 'pixel': // mosaic on pictures and avatars; text gets bars
+      return visual ? ['filter: url(#mc-pixel) !important;', 'filter: none !important;'] : BARS;
   }
   return visual
     ? ['filter: blur(6px) !important;', 'filter: none !important;']
@@ -39,10 +57,13 @@ function look(mode, visual, color) {
        '-webkit-text-fill-color: currentcolor !important; text-shadow: none !important;'];
 }
 
+MC.MODES = ['blur', 'solid', 'scramble', 'glyph', 'bars', 'halftone', 'pixel']; // = BLUR_MODES in electron/settings.js
+const FILL = new Set(['solid', 'bars', 'pixel']); // block behind text (nested spans reset) and SVG filters needed
+
 MC.blurCss = function (state) {
   const S = MC.SEL;
   const color = HEX.test(state.color) ? state.color : '#f5c542';
-  const mode = ['blur', 'solid', 'scramble'].includes(state.mode) ? state.mode : 'blur';
+  const mode = MC.MODES.includes(state.mode) ? state.mode : 'blur';
   let css = '';
   for (const col of COLS) {
     const pre = 'html.mc-' + col + ' ';
@@ -67,7 +88,7 @@ MC.blurCss = function (state) {
       css += targets.map((t) => pre + t).join(',\n') + ' { ' + cover + ' }\n';
       // Solid on text: only the outermost span paints. A nested span's own rounded block over its parent's
       // left seams mid-line; the parent's inline background already covers its children.
-      if (mode === 'solid' && !visual && !MC.COARSE) css += targets.map((t) => pre + t + ' span').join(',\n') + ' { background-color: transparent !important; border-radius: 0 !important; }\n';
+      if (FILL.has(mode) && !visual && !MC.COARSE) css += targets.map((t) => pre + t + ' span').join(',\n') + ' { background-color: transparent !important; border-radius: 0 !important; }\n';
       if (state.hover_reveal) {
         // Only descendants of the hovered row/bubble are revealed; the column prefix is already part of the host.
         const sc = S.scope[col] + ' ';
@@ -105,6 +126,14 @@ MC.ensureFilters = function (state) {
         el('feFlood', { 'flood-color': '#f5c542', result: 'mc-f' }),
         el('feComposite', { in: 'mc-f', in2: 'SourceAlpha', operator: 'in' }),
       ]),
+      // Mosaic: keep one pixel per 8px cell, then dilate it over the cell.
+      f('mc-pixel', [
+        el('feFlood', { x: '4', y: '4', width: '1', height: '1' }),
+        el('feComposite', { width: '8', height: '8' }),
+        el('feTile', { result: 'mc-t' }),
+        el('feComposite', { in: 'SourceGraphic', in2: 'mc-t', operator: 'in' }),
+        el('feMorphology', { operator: 'dilate', radius: '4' }),
+      ]),
     ]);
     svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
     (d.body || d.documentElement).appendChild(svg);
@@ -138,7 +167,7 @@ MC.applyBlur = function (state) {
     MC.css = null;
   }
   if (css !== MC.css) { st.textContent = css; MC.css = css; }
-  if (state.mode === 'solid') MC.ensureFilters(state);
+  if (FILL.has(state.mode)) MC.ensureFilters(state);
   else { const svg = d.getElementById('mc-svg'); if (svg) svg.remove(); }
   const c = root.classList;
   c.toggle('mc-blur', !!state.enabled);

@@ -209,6 +209,7 @@ body {
 
 /* Toolbar: every control is the same pill (icon + label), grouped in a soft track */
 .cg { display: flex; flex: none; gap: 2px; padding: 3px; border-radius: var(--r-pill); background: var(--surface-2); }
+.pill-tag { align-self: center; padding: 2px 8px; font-size: var(--fs-xs); color: var(--text-2); white-space: nowrap; }
 .cb {
   height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 12px 0 9px;
   border: 0; border-radius: var(--r-pill); background: transparent; color: var(--topbar-fg);
@@ -524,10 +525,17 @@ textarea.input { resize: vertical; min-height: 72px; line-height: 1.5; }
 .cz.m-blur, .cz.m-scramble.mav, .cz.m-scramble.mimg { filter: blur(5px); }
 .cz.m-solid { background: var(--block) !important; color: transparent !important; border-radius: 4px; }
 .cz.m-scramble { font-family: var(--font-mono); letter-spacing: .02em; }
+.cz { user-select: none; }
+.cz.m-glyph { -webkit-text-security: square; }
+.cz.m-glyph.mav, .cz.m-glyph.mimg { filter: blur(5px); }
+.cz.m-bars, .cz.m-pixel { background-color: currentColor !important; -webkit-text-fill-color: transparent; border-radius: 999px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.cz.m-bars.mav, .cz.m-bars.mimg { background: var(--block) !important; }
+.cz.m-pixel.mav, .cz.m-pixel.mimg { background: linear-gradient(135deg, var(--mock-a), var(--mock-b)) !important; filter: url(#pv-pixel); }
+.cz.m-halftone { -webkit-mask: radial-gradient(circle, black 35%, transparent 40%) 0 0/4px 4px; filter: blur(2px); }
 .tag { outline: 2px dashed var(--accent); outline-offset: 3px; }
 .reveal .cz.peek { animation: peek 6s var(--ease) infinite; }
 @keyframes peek { 0%, 36% { filter: blur(5px); } 46%, 70% { filter: none; } 80%, 100% { filter: blur(5px); } }
-.reveal .cz.m-solid.peek, .reveal .cz.m-scramble.peek { animation: none; }
+.reveal .cz.peek:not(.m-blur) { animation: none; }
 .cursor {
   position: absolute; z-index: 2; left: 0; top: 0; width: 16px; height: 16px; pointer-events: none;
   clip-path: polygon(0 0, 0 100%, 30% 72%, 52% 100%, 66% 92%, 44% 64%, 82% 64%);

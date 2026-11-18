@@ -1,6 +1,7 @@
-import { createSignal, onMount, onCleanup, For } from "solid-js";
+import { createSignal, onMount, onCleanup, For, Show } from "solid-js";
 import { api, on, win } from "./ipc.js";
 import { maxButton } from "./winstate.js";
+import { censorOk, aiOk as aiSvc } from "../electron/caps.js";
 
 export const SERVICE_NAME = { whatsapp: "WhatsApp", telegram: "Telegram", discord: "Discord", slack: "Slack", mattermost: "Mattermost" };
 export const acctName = (a) => a.name?.trim() || `${SERVICE_NAME[a.service] ?? "Account"} ${a.n}`;
@@ -104,7 +105,9 @@ export default function TopBar(p) {
   const [ws, setWs] = createSignal({ maximized: false, fullscreen: false });
   const mb = () => maxButton(ws());
   const active = () => p.accounts.find((a) => a.id === p.active);
-  const aiOk = () => !active() || active().service === "whatsapp"; // the AI reader exists for WhatsApp only
+  const aiOk = () => aiSvc(active()?.service);
+  const svcName = () => SERVICE_NAME[active()?.service];
+  const noBlur = () => (censorOk(active()?.service) ? "" : `Blur isn't available for ${svcName()}`);
   const b = () => p.blur;
   const onAcct = (id) => !p.home && !p.settingsOpen && p.active === id;
 
@@ -144,14 +147,15 @@ export default function TopBar(p) {
       </div>
       <div class="topbar-space" />
 
-      <div class="cg" role="group" aria-label="Censor">
-        <Pill locked={p.locked} icon="list" label="List" aria="Censor contact list" title="Censor the chat list" on={b().list} pressed={b().list} testid="tb-list" onClick={() => p.onColumn("list", !b().list)} />
-        <Pill locked={p.locked} icon="chat" label="Chat" aria="Censor open chat" title="Censor the open chat" on={b().chat} pressed={b().chat} testid="tb-chat" onClick={() => p.onColumn("chat", !b().chat)} />
-        <Pill locked={p.locked} icon="all" label="All" aria="Censor everything" title="Censor everything: list, chat and media (Ctrl+Shift+X)" on={b().enabled} pressed={b().enabled} testid="rail-blur" onClick={p.onBlur} />
+      <div class="cg" role="group" aria-label="Censor" title={noBlur() || undefined}>
+        <Show when={noBlur()}><span class="pill-tag" data-testid="tb-noblur">Blur doesn't work in this app</span></Show>
+        <Pill locked={p.locked} icon="list" label="List" aria="Censor contact list" title={noBlur() || "Censor the chat list"} on={b().list} pressed={b().list} disabled={!!noBlur()} testid="tb-list" onClick={() => p.onColumn("list", !b().list)} />
+        <Pill locked={p.locked} icon="chat" label="Chat" aria="Censor open chat" title={noBlur() || "Censor the open chat"} on={b().chat} pressed={b().chat} disabled={!!noBlur()} testid="tb-chat" onClick={() => p.onColumn("chat", !b().chat)} />
+        <Pill locked={p.locked} icon="all" label="All" aria="Censor everything" title={noBlur() || "Censor everything: list, chat and media (Ctrl+Shift+X)"} on={b().enabled} pressed={b().enabled} disabled={!!noBlur()} testid="rail-blur" onClick={p.onBlur} />
       </div>
       <div class="cg">
         <Pill locked={p.locked} icon="ai" label={p.agentWatch ? "AI · watch" : p.agentOn ? "AI · auto" : "AI"} aria="AI panel"
-          title={p.agentWatch ? "Watch all is on: matching chat previews against your rules (never sends)" : p.agentOn ?"Auto-assist is on: drafting suggestions (never sends)" : aiOk() ? "AI assistant" : "AI assistant is WhatsApp-only for now"} on={p.panelOpen || p.agentOn} pressed={p.panelOpen}
+          title={p.agentWatch ? "Watch all is on: matching chat previews against your rules (never sends)" : p.agentOn ?"Auto-assist is on: drafting suggestions (never sends)" : aiOk() ? "AI assistant" : `AI assist isn't available for ${svcName()}`} on={p.panelOpen || p.agentOn} pressed={p.panelOpen}
           disabled={!aiOk()} testid="rail-ai" onClick={p.onPanel} />
       </div>
       <div class="cg">

@@ -7,6 +7,7 @@ import Home from "./Home.jsx";
 import Clips from "./Clips.jsx";
 import Files from "./Files.jsx";
 import { api, on } from "./ipc.js";
+import { censorOk } from "../electron/caps.js";
 
 const quiet = (p) => p.catch(() => {});
 
@@ -28,6 +29,7 @@ export default function App() {
   const [clipOpen, setClipOpen] = createSignal(false); // clipboard history popover
   const [filesOpen, setFilesOpen] = createSignal(false); // download file manager
   const locked = () => lockInfo().locked;
+  const activeSvc = () => accts().accounts.find((a) => a.id === accts().active)?.service;
   // Nothing stays open over the lock screen: popovers, Settings and the remove dialog close when it locks.
   createEffect(() => { if (locked()) { setClipOpen(false); setSettingsOpen(false); setFilesOpen(false); setRemoving(null); } });
   const [leaving, setLeaving] = createSignal(false); // the lock screen's exit animation is playing over the unlocked app
@@ -71,6 +73,7 @@ export default function App() {
   const onKey = (e) => {
     if (locked()) return; // top-bar shortcuts wait for unlock (main refuses the commands anyway)
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "x") {
+      if (!censorOk(activeSvc())) return; // no censor on this page: the shortcut does nothing
       e.preventDefault();
       quiet(api.toggleBlur());
     }
@@ -141,7 +144,7 @@ export default function App() {
           </Show>
         </main>
         <Show when={settings().panel_open}>
-          <AIPanel settings={settings} update={update} hasKey={hasKey} ctx={ctx} agent={agent} suggs={suggs} setSuggs={setSuggs}
+          <AIPanel service={activeSvc()} settings={settings} update={update} hasKey={hasKey} ctx={ctx} agent={agent} suggs={suggs} setSuggs={setSuggs}
             onOpenSettings={(where) => { setAiAsk(where); setSettingsOpen(true); }} onClose={() => quiet(api.setPanel(false))} />
         </Show>
       </Show>
