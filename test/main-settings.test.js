@@ -164,7 +164,7 @@ test('censor and AI are off for services without selectors; main and the shell b
   const { censorOk, aiOk } = await import('../electron/caps.js');
   assert.deepEqual(['whatsapp', 'telegram', 'discord', 'slack', 'mattermost', undefined].map(censorOk), [true, true, false, false, false, true]);
   assert.deepEqual(['whatsapp', 'telegram', 'discord'].map(aiOk), [true, false, false]);
-  const read = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+  const read = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
   assert.match(read('electron/main.js'), /function toggleBlur\(\) \{\n[^\n]*\n\s*if \(!censorOk\(svc\)\) return/);
   assert.match(read('src/App.jsx'), /if \(!censorOk\(activeSvc\(\)\)\) return/);
 });
