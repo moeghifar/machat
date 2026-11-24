@@ -9,12 +9,12 @@ export const TOPBAR = 48; // must equal --topbar-h in src/style.css
 export const PANEL_W = 380;
 export const WA_URL = 'https://web.whatsapp.com/';
 export const TG_URL = 'https://web.telegram.org/k/';
-const URLS = { whatsapp: WA_URL, telegram: TG_URL, discord: 'https://discord.com/app', slack: 'https://app.slack.com/client' };
-export const SERVICES = ['whatsapp', 'telegram', 'discord', 'slack', 'mattermost'];
+const URLS = { whatsapp: WA_URL, telegram: TG_URL, discord: 'https://discord.com/app', slack: 'https://app.slack.com/client', instagram: 'https://www.instagram.com/direct/inbox/' };
+export const SERVICES = ['whatsapp', 'telegram', 'discord', 'slack', 'mattermost', 'instagram'];
 /** Start page of a service; Mattermost is self-hosted, so its account's own server URL. */
 export const serviceUrl = (service, url) => (service === 'mattermost' ? url : URLS[service] ?? URLS.whatsapp);
 /** Sign-in domains (and their subdomains) an account page may navigate to besides its own origin. */
-export const AUTH_DOMAINS = { discord: ['discord.com', 'discordapp.com'], slack: ['slack.com'] };
+export const AUTH_DOMAINS = { discord: ['discord.com', 'discordapp.com'], slack: ['slack.com'], instagram: ['instagram.com', 'facebook.com'] };
 /** Mattermost server URL: https, or http to localhost/a private network; no credentials, query or fragment. */
 export function validServerUrl(raw) {
   if (typeof raw !== 'string' || raw.length > 2000) return false;
@@ -146,7 +146,7 @@ export function winAct({ maximized, fullscreen }, wasMax, f11 = false) {
 }
 
 export const NAME_MAX = 40;
-const SERVICE_LABEL = { whatsapp: 'WhatsApp', telegram: 'Telegram', discord: 'Discord', slack: 'Slack', mattermost: 'Mattermost' };
+const SERVICE_LABEL = { whatsapp: 'WhatsApp', telegram: 'Telegram', discord: 'Discord', slack: 'Slack', mattermost: 'Mattermost', instagram: 'Instagram' };
 /** Display name: the user's name for the account, or "WhatsApp 2". */
 export const acctLabel = (a) => (a?.name?.trim() || `${SERVICE_LABEL[a?.service] ?? 'Account'} ${a?.n ?? ''}`.trim());
 /**

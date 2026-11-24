@@ -4,6 +4,7 @@ import { acctName, SERVICE_NAME, ServiceIcon, Icon } from "./TopBar.jsx";
 const PLATFORMS = [
   ["whatsapp", "Scan the QR code with your phone to link it."],
   ["telegram", "Sign in with your phone number or a QR code."],
+  ["instagram", "Sign in to Instagram to use your Direct messages."],
   ["discord", "Sign in with your Discord email or a QR code."],
   ["slack", "Sign in to your Slack workspace."],
   ["mattermost", "Enter your team's server address, then sign in."],

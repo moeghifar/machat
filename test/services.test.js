@@ -16,6 +16,9 @@ test('mattermost server URL: https, or http to localhost/private only', () => {
 test('new services: urls, labels, auth domains', () => {
   assert.equal(serviceUrl('discord'), 'https://discord.com/app');
   assert.equal(serviceUrl('slack'), 'https://app.slack.com/client');
+  assert.equal(serviceUrl('instagram'), 'https://www.instagram.com/direct/inbox/');
+  assert.equal(navDecision('https://www.instagram.com/accounts/login/', serviceUrl('instagram'), AUTH_DOMAINS.instagram), 'allow');
+  assert.equal(navDecision('https://instagram.com.evil.com/', serviceUrl('instagram'), AUTH_DOMAINS.instagram), 'external');
   assert.equal(serviceUrl('mattermost', 'https://chat.example.com/'), 'https://chat.example.com/');
   assert.equal(acctLabel({ service: 'mattermost', n: 2 }), 'Mattermost 2');
   const slack = serviceUrl('slack');

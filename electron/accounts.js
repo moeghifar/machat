@@ -17,7 +17,7 @@ export function makeAccounts(ctx) {
   };
   // Discord, Slack, Mattermost: no selectors, so no censor, reader or AI button; notify.js still redacts nothing (censoring off).
   // ponytail: censor is off on these services; add selectors-<svc>.js + blur + boot when someone needs it.
-  INIT.discord = INIT.slack = INIT.mattermost = '(function(){const MC=(globalThis.__machatLib||={});MC.censoring=()=>false;'
+  INIT.instagram = INIT.discord = INIT.slack = INIT.mattermost = '(function(){const MC=(globalThis.__machatLib||={});MC.censoring=()=>false;'
     + 'window.__machat={apply(s){MC.state={...MC.state,...s};}};})();\n' + read(ctx.root, ['notify']);
   const UA = accountUA(process.versions.chrome);
   const views = new Map(); // id -> WebContentsView

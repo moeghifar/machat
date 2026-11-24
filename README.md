@@ -34,19 +34,19 @@
 
 ## Purpose
 
-Machat brings your WhatsApp, Telegram, Discord, Slack and Mattermost accounts into a single desktop window and adds what the web clients leave out:
+Machat brings your WhatsApp, Telegram, Instagram, Discord, Slack and Mattermost accounts into a single desktop window and adds what the web clients leave out:
 
 - **Privacy on screen.** Hide names, messages and media while you share your screen, present, or work in public.
 - **Protection at rest.** Lock the app behind a PIN or password when you step away.
 - **Your files, in order.** Every account downloads into its own folder, with a built-in file manager.
 - **Help when you reply.** An optional AI assistant reads the open chat and drafts replies in your tone. You decide what gets sent.
 
-Machat is an independent project. It is not affiliated with, endorsed by, or sponsored by WhatsApp, Meta, Telegram, Discord, Slack, Salesforce, or Mattermost.
+Machat is an independent project. It is not affiliated with, endorsed by, or sponsored by WhatsApp, Meta, Instagram, Telegram, Discord, Slack, Salesforce, or Mattermost.
 
 ## Getting started
 
 1. **Install.** Download the installer for your system from [Releases](https://github.com/moeghifar/machat/releases/latest) and open it (see [Download](#download) for the unsigned-build prompt).
-2. **Add an account.** Machat opens on Home. Under **Add a platform**, click **Add** next to WhatsApp, Telegram, Discord, Slack or Mattermost, then sign in on the page that opens (WhatsApp: scan the QR code with your phone). For Mattermost, a pop-up asks for your team's server address first.
+2. **Add an account.** Machat opens on Home. Under **Add a platform**, click **Add** next to WhatsApp, Telegram, Instagram, Discord, Slack or Mattermost, then sign in on the page that opens (WhatsApp: scan the QR code with your phone). For Mattermost, a pop-up asks for your team's server address first.
 3. **Name it.** On Home, click an account's name to rename it, for example "Work" or "Sales Team". You can add up to 10 accounts.
 4. **Hide what's on screen.** Use **List**, **Chat** or **All** in the top bar, or press **Ctrl+Shift+X**. Hover a row to peek. Pick the style in **Settings → Censor**.
 5. **Lock it.** Set a PIN or password in **Settings → Lock**, choose a lock-screen style, then press **Lock** in the top bar. While locked, every top-bar button is disabled until you unlock.
@@ -56,7 +56,7 @@ Machat is an independent project. It is not affiliated with, endorsed by, or spo
 ## Features
 
 ### Accounts
-- WhatsApp, Telegram, Discord, Slack and Mattermost (your own server), with several accounts side by side
+- WhatsApp, Telegram, Instagram, Discord, Slack and Mattermost (your own server), with several accounts side by side
 - A Home screen for adding, opening, renaming and removing accounts
 - Each account runs in its own isolated session
 
@@ -68,7 +68,7 @@ Machat is an independent project. It is not affiliated with, endorsed by, or spo
 - Choose which of five kinds of content to hide
 - A live preview shows exactly what is hidden
 - Notification text is redacted
-- Available on WhatsApp and Telegram; on Discord, Slack and Mattermost the controls are disabled and say so
+- Available on WhatsApp and Telegram; on Instagram, Discord, Slack and Mattermost the controls are disabled and say so
 
 ### App lock
 - PIN (4–12 digits) or password (8–128 characters)
@@ -173,4 +173,4 @@ Licensed under the **Apache License, Version 2.0** (the "License"). You may not 
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an **"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND**, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-WhatsApp, Telegram, Discord, Slack and Mattermost are trademarks of their respective owners and are used here only to describe compatibility.
+WhatsApp, Telegram, Instagram, Discord, Slack and Mattermost are trademarks of their respective owners and are used here only to describe compatibility.

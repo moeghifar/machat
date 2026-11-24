@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Instagram accounts (Direct messages). Censor and AI are disabled there, like Discord, Slack and Mattermost.
+
 ## v0.0.3 — 2026-11-19
 
 ### New platforms
