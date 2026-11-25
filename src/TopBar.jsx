@@ -72,6 +72,7 @@ export const ICONS = {
   lock: () => <><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /><circle class="r" cx="12" cy="15.5" r="1.4" /></>,
   gear: () => <><circle cx="12" cy="12" r="3" /><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" /></>,
   plus: () => <path d="M12 5v14M5 12h14" />,
+  up: () => <path d="M12 19V5M6 11l6-6 6 6" />,
   // Auto-assist modes
   listen: () => <><path d="M5 4.5h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-4.5 3v-3H5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z" /><circle class="r" cx="8" cy="11" r="1.2" /><circle class="r" cx="12" cy="11" r="1.2" /><circle class="r" cx="16" cy="11" r="1.2" /></>,
   queue: () => <><path d="M9 6.5h11M9 12h11M9 17.5h11" /><circle class="r" cx="4.6" cy="6.5" r="1.4" /><circle class="r" cx="4.6" cy="12" r="1.4" /><circle class="r" cx="4.6" cy="17.5" r="1.4" /></>,
@@ -170,6 +171,11 @@ export default function TopBar(p) {
         <Pill locked={p.locked} icon="folder" label="Files" aria="Downloaded files" title="Downloaded files" on={p.filesOpen} pressed={p.filesOpen} testid="tb-downloads" onClick={p.onDownloads} />
         <Pill locked={p.locked} icon="lock" label="Lock" aria="Lock now" title="Lock now" testid="rail-lock" onClick={p.onLock} />
       </div>
+      <Show when={p.update?.newer}>
+        <div class="cg">
+          <Pill locked={p.locked} icon="up" label={`v${p.update.latest}`} aria={`Machat ${p.update.latest} is available`} title={`Machat ${p.update.latest} is available (you have ${p.update.current}). Open the download page.`} on testid="tb-update" onClick={p.onUpdate} />
+        </div>
+      </Show>
       <div class="cg">
         <Pill locked={p.locked} icon="gear" label="Settings" on={p.settingsOpen} pressed={p.settingsOpen} testid="rail-settings" onClick={p.onSettings} />
       </div>

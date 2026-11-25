@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## v0.0.4 — 2026-11-25
 
+- Update notice: Machat checks GitHub for a newer release at start and every 6 hours. A **v<version>** button appears in the top bar and opens the download page. Settings → General has **Check now** and an on/off switch. Nothing is downloaded or installed automatically.
 - Instagram accounts (Direct messages). Censor and AI are disabled there, like Discord, Slack and Mattermost.
 
 ## v0.0.3 — 2026-11-19

@@ -1,8 +1,8 @@
 {
   "name": "machat",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
-  "description": "A private, focused desktop workspace for WhatsApp, Telegram, Discord, Slack and Mattermost",
+  "description": "A private, focused desktop workspace for WhatsApp, Telegram, Instagram, Discord, Slack and Mattermost",
   "author": "moeghifar",
   "homepage": "https://github.com/moeghifar/machat",
   "type": "module",

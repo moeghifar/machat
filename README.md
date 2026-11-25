@@ -51,7 +51,8 @@ Machat is an independent project. It is not affiliated with, endorsed by, or spo
 4. **Hide what's on screen.** Use **List**, **Chat** or **All** in the top bar, or press **Ctrl+Shift+X**. Hover a row to peek. Pick the style in **Settings → Censor**.
 5. **Lock it.** Set a PIN or password in **Settings → Lock**, choose a lock-screen style, then press **Lock** in the top bar. While locked, every top-bar button is disabled until you unlock.
 6. **Find your downloads.** Click **Files** in the top bar to browse each account's downloads: open, copy the path, show in folder, rename or delete. **Open folder** opens the real directory.
-7. **Optional: AI assistant.** Add an Anthropic or OpenAI-compatible API key in **Settings → AI**, then open the **AI** panel to draft replies (WhatsApp).
+7. **Stay up to date.** When a new version is out, a **v<version>** button appears in the top bar. Click it to open the download page.
+8. **Optional: AI assistant.** Add an Anthropic or OpenAI-compatible API key in **Settings → AI**, then open the **AI** panel to draft replies (WhatsApp).
 
 ## Features
 
@@ -91,6 +92,7 @@ Machat is an independent project. It is not affiliated with, endorsed by, or spo
 - Clipboard history, kept in memory only, with one-click paste into the open chat
 - Light and dark themes with a calm matcha palette; the theme also switches the chat pages themselves
 - Respects the system's reduced-motion setting
+- Update notice: Machat checks GitHub for a new release at start and every 6 hours and shows it in the top bar; one click opens the download page (turn it off or **Check now** in Settings → General)
 ### Files
 - Downloads are saved per account in `<name>-<8 characters>` folders (spaces become `__`), e.g. `Sales__Team-k3j9x0qa`
 - Renaming an account renames its folder and keeps your files
@@ -164,6 +166,7 @@ npm run dist    # build installers for the current OS into release/
 - The AI assistant contacts only the API provider you configure, and only when you use it.
 - Lock secrets are stored as hashes in your system keychain.
 - Clipboard history is never written to disk.
+- The update check sends one anonymous request to the GitHub API; it can be turned off in Settings.
 
 ## License
 

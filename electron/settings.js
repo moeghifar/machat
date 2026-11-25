@@ -32,6 +32,7 @@ export const defaults = () => ({
   panel_open: false,
   download_dir: '',
   download_ask: false,
+  update_check: true, // ask GitHub for a newer release at start and every 6 hours
   // Account ids whose partition dir is deleted at next start (Chromium may hold files open until exit).
   removed: [],
 });
@@ -56,7 +57,7 @@ function fill(raw) {
       d[k][f] = v;
     }
   }
-  for (const k of ['panel_open', 'download_dir', 'download_ask']) {
+  for (const k of ['panel_open', 'download_dir', 'download_ask', 'update_check']) {
     if (raw[k] === undefined) continue;
     if (typeof raw[k] !== typeof d[k]) return null;
     d[k] = raw[k];

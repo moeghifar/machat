@@ -28,6 +28,8 @@ export default function App() {
   const [removing, setRemoving] = createSignal(null); // account awaiting remove confirmation
   const [clipOpen, setClipOpen] = createSignal(false); // clipboard history popover
   const [filesOpen, setFilesOpen] = createSignal(false); // download file manager
+  const [upd, setUpd] = createSignal(null); // { current, latest, newer } from GitHub; the pill shows when newer
+  const checkUpdate = () => api.checkUpdate().then((u) => { setUpd(u); return u; });
   const locked = () => lockInfo().locked;
   const activeSvc = () => accts().accounts.find((a) => a.id === accts().active)?.service;
   // Nothing stays open over the lock screen: popovers, Settings and the remove dialog close when it locks.
@@ -79,6 +81,16 @@ export default function App() {
     }
   };
 
+  // Update notice: 10 s after start, then every 6 hours, while the setting is on. Failures stay silent here.
+  let upTimer;
+  createEffect(() => {
+    clearInterval(upTimer);
+    if (!settings()?.update_check) return;
+    const t = setTimeout(() => quiet(checkUpdate()), 10000);
+    upTimer = setInterval(() => quiet(checkUpdate()), 6 * 3600 * 1000);
+    onCleanup(() => { clearTimeout(t); clearInterval(upTimer); });
+  });
+
   onMount(() => {
     refreshAll();
     window.addEventListener("keydown", onKey);
@@ -112,6 +124,7 @@ export default function App() {
           onLock={lockNow}
           onSettings={() => { setFilesOpen(false); setSettingsOpen(!settingsOpen()); }}
           clipOpen={clipOpen()} onClip={() => setClipOpen(!clipOpen())}
+          update={upd()} onUpdate={() => quiet(api.openRelease(upd()?.latest))}
           filesOpen={filesOpen()} onDownloads={() => { setSettingsOpen(false); setFilesOpen(!filesOpen()); }}
           locked={locked() || leaving()}
         />
@@ -121,7 +134,7 @@ export default function App() {
         <main class="content" aria-label="Chat view">
           <Show when={settingsOpen()}>
             <Settings settings={settings} update={update} agent={agent} hasKey={hasKey} setHasKey={setHasKey}
-              lockInfo={lockInfo} refreshLock={refreshLock} pinAsk={pinAsk} aiAsk={aiAsk} onClose={() => setSettingsOpen(false)} />
+              lockInfo={lockInfo} refreshLock={refreshLock} update={upd} checkUpdate={checkUpdate} pinAsk={pinAsk} aiAsk={aiAsk} onClose={() => setSettingsOpen(false)} />
           </Show>
           <Show when={filesOpen()}>
             <Files onClose={() => setFilesOpen(false)} />

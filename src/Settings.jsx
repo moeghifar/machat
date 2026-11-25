@@ -283,6 +283,12 @@ export default function Settings(p) {
   const s = () => p.settings();
   const [tab, setTab] = createSignal("censor");
   const [err, setErr] = createSignal("");
+  const [updMsg, setUpdMsg] = createSignal("");
+  const checkNow = async () => {
+    setUpdMsg("Checking…");
+    try { const u = await p.checkUpdate(); setUpdMsg(u.newer ? `Machat ${u.latest} is available (you have ${u.current}).` : `You have the latest version (${u.current}).`); }
+    catch (e) { setUpdMsg(`Could not check: ${String(e?.message ?? e).replace(/^Error: /, "")}`); }
+  };
   const [key, setKey] = createSignal("");
   const [keyMsg, setKeyMsg] = createSignal("");
   const [pin, setPin] = createSignal("");
@@ -632,6 +638,13 @@ export default function Settings(p) {
               </Row>
               <Row label="Ask where to save" hint="Show the save dialog for every download. Right-click › Save image as… always asks.">
                 <Switch label="Ask where to save" checked={s().download_ask} testid="download-ask" onChange={(v) => patch((d) => { d.download_ask = v; })} />
+              </Row>
+              <Row label="Updates" hint={updMsg() || "Machat checks GitHub for a new release at start and every 6 hours, and shows it in the top bar. Nothing is downloaded or installed."}>
+                <div class="dir-row">
+                  <Switch label="Check for updates" checked={s().update_check} testid="update-check" onChange={(v) => patch((d) => { d.update_check = v; })} />
+                  <button type="button" class="btn" data-testid="update-now" onClick={checkNow}>Check now</button>
+                  <Show when={p.update?.()?.newer}><button type="button" class="btn primary" onClick={() => api.openRelease(p.update().latest)}>Get v{p.update().latest}</button></Show>
+                </div>
               </Row>
               <Row label="Clipboard history: watch system clipboard" hint="Off: only copies made inside chats are listed. On: anything you copy while Machat is focused. Kept in memory only, cleared when Machat quits.">
                 <Switch label="Watch system clipboard" checked={s().clip.watch} testid="clip-watch" onChange={(v) => patch((d) => { d.clip.watch = v; })} />

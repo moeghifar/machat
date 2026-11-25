@@ -1,11 +1,12 @@
 // Shell command table (same snake_case names as src-tauri/src/commands.rs) and the ipc handlers.
-import { ipcMain, dialog, utilityProcess, Notification, shell, nativeTheme, clipboard } from 'electron';
+import { app, ipcMain, dialog, utilityProcess, Notification, shell, nativeTheme, clipboard } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fromShell } from './settings.js';
 import * as AI from './ai.js';
 import { serviceUrl, confine } from './util.js';
+import { checkUpdate, RELEASES } from './update.js';
 import { makeQueue, makeLimiter, SWITCH_MS, MAX_QUEUE, MATCH_CAP, validateRules } from './agent-core.js';
 import { makeSender, sendBlocked } from './send.js';
 import { makeAuto } from './auto.js';
@@ -320,6 +321,10 @@ export function registerIpc(m) {
     },
     rename_account: ({ id, name }) => m.accts.rename(id, name),
     // App-wide: drives prefers-color-scheme in the shell and in every account page.
+    check_update: () => checkUpdate(app.getVersion()),
+    app_version: () => app.getVersion(),
+    // Only this repo's release pages, never a URL from the renderer as-is.
+    open_release: ({ version }) => shell.openExternal(/^\d+\.\d+\.\d+$/.test(version ?? '') ? `${RELEASES}/tag/v${version}` : `${RELEASES}/latest`),
     set_theme: ({ theme }) => { nativeTheme.themeSource = ['light', 'dark'].includes(theme) ? theme : 'system'; },
     // File manager over the download base. Paths are relative to the base and confined to it (util.confine).
     // No dir: the active account's folder (created if missing), else the base.
