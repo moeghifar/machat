@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Censor now works on Mattermost (names, avatars, messages and media in the sidebar, channel and threads).
+- Top-bar account tiles: the mouse wheel scrolls them sideways, faded edges show more tiles, and the open account scrolls into view.
+
 ## v0.0.4 — 2026-11-25
 
 - Update notice: Machat checks GitHub for a newer release at start and every 6 hours. A **v<version>** button appears in the top bar and opens the download page. Settings → General has **Check now** and an on/off switch. Nothing is downloaded or installed automatically.

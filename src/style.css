@@ -179,7 +179,13 @@ body {
 }
 .topbar-space { flex: 1; align-self: stretch; min-width: var(--sp-3); }
 .topbar-group { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.tiles { overflow-x: auto; scrollbar-width: none; padding: 4px 2px; }
+.tiles { overflow-x: auto; scrollbar-width: none; padding: 4px 2px; scroll-behavior: smooth; scroll-snap-type: x proximity; scroll-padding-inline: 24px; overscroll-behavior-x: contain; }
+.tiles::-webkit-scrollbar { display: none; }
+.tiles > .tile { scroll-snap-align: start; }
+/* Fade the edge that has more tiles behind it. */
+.tiles.more-l { -webkit-mask-image: linear-gradient(to right, transparent, black 28px); }
+.tiles.more-r { -webkit-mask-image: linear-gradient(to left, transparent, black 28px); }
+.tiles.more-l.more-r { -webkit-mask-image: linear-gradient(to right, transparent, black 28px, black calc(100% - 28px), transparent); }
 .brand { display: flex; align-items: center; gap: 8px; margin-right: var(--sp-1); flex: none; }
 .logo { display: block; width: 26px; height: 26px; flex: none; transition: transform var(--t-med) var(--ease); }
 .brand:hover .logo { transform: rotate(-6deg) scale(1.06); }

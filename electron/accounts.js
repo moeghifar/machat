@@ -14,10 +14,11 @@ export function makeAccounts(ctx) {
   const INIT = {
     whatsapp: read(ctx.root, ['selectors', 'blur', 'notify', 'reader', 'draft', 'aibutton', 'boot']),
     telegram: read(ctx.root, ['selectors-tg', 'blur', 'notify', 'boot']),
+    mattermost: read(ctx.root, ['selectors-mm', 'blur', 'notify', 'boot']),
   };
   // Discord, Slack, Mattermost: no selectors, so no censor, reader or AI button; notify.js still redacts nothing (censoring off).
   // ponytail: censor is off on these services; add selectors-<svc>.js + blur + boot when someone needs it.
-  INIT.instagram = INIT.discord = INIT.slack = INIT.mattermost = '(function(){const MC=(globalThis.__machatLib||={});MC.censoring=()=>false;'
+  INIT.instagram = INIT.discord = INIT.slack = '(function(){const MC=(globalThis.__machatLib||={});MC.censoring=()=>false;'
     + 'window.__machat={apply(s){MC.state={...MC.state,...s};}};})();\n' + read(ctx.root, ['notify']);
   const UA = accountUA(process.versions.chrome);
   const views = new Map(); // id -> WebContentsView

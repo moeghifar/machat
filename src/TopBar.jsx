@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup, For, Show } from "solid-js";
+import { createSignal, createEffect, onMount, onCleanup, For, Show } from "solid-js";
 import { api, on, win } from "./ipc.js";
 import { maxButton } from "./winstate.js";
 import { censorOk, aiOk as aiSvc } from "../electron/caps.js";
@@ -132,10 +132,31 @@ export default function TopBar(p) {
     if (!p.locked) p.onRemove(id);
   };
 
+  // Account tiles overflow sideways: a mouse wheel scrolls them, faded edges show there's more, the open one stays in view.
+  let tiles;
+  const [edge, setEdge] = createSignal({ l: false, r: false });
+  const measure = () => { if (!tiles) return; const { scrollLeft: x, scrollWidth: w, clientWidth: c } = tiles; setEdge({ l: x > 2, r: x + c < w - 2 }); };
+  const onTileWheel = (e) => {
+    if (!tiles || tiles.scrollWidth <= tiles.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    tiles.scrollBy({ left: e.deltaY });
+  };
+  onMount(() => {
+    const ro = new ResizeObserver(measure);
+    ro.observe(tiles);
+    onCleanup(() => ro.disconnect());
+  });
+  createEffect(() => {
+    p.accounts.length; const id = p.active; // re-run when tiles change or another account opens
+    queueMicrotask(() => { tiles?.querySelector('.tile.active')?.scrollIntoView({ block: 'nearest', inline: 'nearest' }); measure(); });
+    void id;
+  });
+
   return (
     <header class="topbar" classList={{ locked: !!p.locked }} data-testid="titlebar">
       <div class="brand" title="Machat"><Logo /><span class="wordmark">Machat</span></div>
-      <div class="topbar-group tiles" role="tablist" aria-label="Accounts">
+      <div ref={tiles} class="topbar-group tiles" classList={{ "more-l": edge().l, "more-r": edge().r }} role="tablist" aria-label="Accounts"
+        onWheel={onTileWheel} onScroll={measure}>
         <button type="button" class="tile" classList={{ active: p.home && !p.settingsOpen }} role="tab" aria-selected={p.home && !p.settingsOpen ? "true" : "false"}
           disabled={p.locked} aria-label="Home" title="Home: your accounts, and add new ones" data-testid="tb-home" onClick={p.onHome}>
           <span class="tile-ico is-home"><Icon name="home" /></span><span>Home</span>

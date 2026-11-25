@@ -69,7 +69,7 @@ Machat is an independent project. It is not affiliated with, endorsed by, or spo
 - Choose which of five kinds of content to hide
 - A live preview shows exactly what is hidden
 - Notification text is redacted
-- Available on WhatsApp and Telegram; on Instagram, Discord, Slack and Mattermost the controls are disabled and say so
+- Available on WhatsApp, Telegram and Mattermost; on Instagram, Discord and Slack the controls are disabled and say so
 
 ### App lock
 - PIN (4–12 digits) or password (8–128 characters)
